@@ -15,8 +15,9 @@ double Recursion::value(const double& N) {
   
   for( double  _k = 1; _k <  N-1; ++_k)
     _cc->at(_k+1) = 2.0 * c_ * _cc->at(_k) - _cc->at(_k-1);
-
- 
+  
+  return _cc->at(N-1);
+  
 }
 
   // std::cout << "cos(" << N << "*" << x_ << ") =" << std::endl;
