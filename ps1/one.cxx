@@ -9,6 +9,7 @@
 
 //Local includes
 #include "Recursion.h"
+#include "Plotter.h"
 
 
 //  An example of the propagation of errors in the trigonometric
@@ -19,19 +20,20 @@ int main(int argc, char *argv[]) {
   //std::shared_ptr<Recursion> r = std::make_shared<Recursion>();
   
   Recursion *r = new Recursion();
+  Plotter *p = new Plotter();
   
-  std::map<double,double> points;
+  std::map<double,double> pts;
   std::map<double,double>::iterator itr;
   
   for(int i = 2; i<=8; ++i)
-    points[i] = r->value(pow(10,i));
+    pts[i] = r->value(pow(10,i));
   
-   for (itr = points.begin(); itr != points.end(); ++itr)
-     std::cout << "(" << itr->first << "," << std::setprecision (15) << itr->second << ")" << std::endl;
-     
   
-  //  TApplication tapp("tapp",&argc,argv);
-  //tapp.Run();
+  TApplication tapp("tapp",&argc,argv);
+  
+  (p->plot(pts))->Draw("ALP");
+  
+  tapp.Run();
   
   return 0;
   

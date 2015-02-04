@@ -1,4 +1,4 @@
-CXX := g++
+CXX := c++
 CXXFLAGS := -std=c++11
 INCFLAGS := -I.
 

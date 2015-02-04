@@ -2,24 +2,24 @@
 #define PLOTTER_H
 
 #include <map>
-
+#include <iomanip>
 #include "TGraph.h"
 #include "TMultiGraph.h"
 
 class Plotter {
-  
+
 public:
-  Plotter();
-  virtual ~Plotter();
-  
-  void plot(std::map<double,double>& values);
-  
+Plotter();
+virtual ~Plotter();
+
+TGraph* plot(std::map<double,double> & pts);
+
+
 private:
-  TGraph *tg;
-  
+TGraph *tg;
+
 protected:
 
 };
   
-
 #endif
