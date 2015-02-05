@@ -40,12 +40,15 @@ int main(int argc, char *argv[]) {
   c1->SetLogx();
   (p->plot(pts))->Draw("AL");
   
+  c1->Modified();
+  c1->Update();
+
   c2->cd();
   c2->SetLogx();
   c2->SetLogy();
   
   auto err = p->error();
-  err->GetYaxis()->SetRangeUser(pow(10,1),pow(10,12));
+  err->GetYaxis()->SetRangeUser(pow(10,1),pow(10,15));
   (err)->Draw("AL");
   
   c2->Modified();
