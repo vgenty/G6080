@@ -62,74 +62,72 @@ int main(int argc, char **argv) {
 */
 
 
-/*  The number of multiplies in the loop */
-
-const int nmult = 10000;
-
-/*  The number of results to print out */
-
-const int nprint = 8;
-
-/*  The seed to start the random number sequence */
-
-const int seed = 1234;
-
-main()
+int main(int arc, char **argv)
 {
-
+  const int nmult  = atoi(argv[1]);
+  const int nprint = 8;
+  const int seed   = 1234;
+  
   double a[nmult], b[nmult], c[nmult];
   int i;
 
   struct timespec tstart, tstop;
-
+  
   struct timespec ts;
   current_utc_time(&ts);
-
-  /*  Initialize random floating point values */
-
-  printf("Random initial values, using seed %d\n", seed);
-
+  
   srand48(seed);
-
-  printf("First random number is %e\n\n", drand48() );
-  printf("\tx\t\ty\n");
-
+  
   for ( i = 0; i < nmult; i++ ) {
-
     a[i] = drand48();
     b[i] = drand48();
-
-    if ( i < nprint ) {
-      printf("\t%e\t%e\n", a[i], b[i]);
-    }
   }
-
-
+  //////////////////PART A  
   tstart.tv_sec = 0;
   tstart.tv_nsec = 0;
   tstop.tv_sec = 0;
   tstop.tv_nsec = 0;
 
   current_utc_time(&tstart);
-
+  
   for ( i = 0; i < nmult; i++ ) {
-
-    c[i] = a[i] * b[i]; 
-
+    c[i] = a[i] * b[i];
   }
 
   current_utc_time(&tstop);
+  
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
-  printf("\nResults are:\n\ta\t\tb\t\tc\n");
+  //////////////////PART B  
+  tstart.tv_sec = 0;
+  tstart.tv_nsec = 0;
+  tstop.tv_sec = 0;
+  tstop.tv_nsec = 0;
 
-  for ( i = 0; i < nprint; i++ ) {
-    printf("\t%e\t%e\t%e\n", a[i], b[i], c[i] );
+  current_utc_time(&tstart);
+  
+  for ( i = 0; i < nmult; i++ ) {
+    c[i] += a[i] * b[i];
   }
 
-  printf("\n\t\t\tStart\t\tStop\t\tDifference\n");
-  printf("Time in seconds:\t%lu\t%lu\t%lu\n",  tstart.tv_sec, tstop.tv_sec,
-    tstop.tv_sec - tstart.tv_sec);
+  current_utc_time(&tstop);
+  
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
-  printf("Time in nanoseconds:\t%lu\t%lu\t%lu\n",  tstart.tv_nsec,
-    tstop.tv_nsec, tstop.tv_nsec - tstart.tv_nsec);
-}
+  //////////////////PART C  
+  tstart.tv_sec = 0;
+  tstart.tv_nsec = 0;
+  tstop.tv_sec = 0;
+  tstop.tv_nsec = 0;
+
+  current_utc_time(&tstart);
+  
+  for ( i = 0; i < nmult; i++ ) {
+    c[i] += a[i] * b[2*i+20];
+  }
+
+  current_utc_time(&tstop);
+  
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
+  
+  }
