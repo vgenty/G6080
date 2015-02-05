@@ -101,7 +101,7 @@ int main(int arc, char **argv)
 
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
   //////////////////PART B
   tstart.tv_sec = 0;
@@ -117,7 +117,7 @@ int main(int arc, char **argv)
 
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
   //////////////////PART C  
   tstart.tv_sec = 0;
@@ -133,7 +133,7 @@ int main(int arc, char **argv)
 
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",mnmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
 
   //////////////////PART D
@@ -150,7 +150,7 @@ int main(int arc, char **argv)
 
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
   //////////////////PART E
   tstart.tv_sec = 0;
@@ -166,7 +166,7 @@ int main(int arc, char **argv)
 
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
 
   //////////////////PART F
@@ -183,7 +183,7 @@ int main(int arc, char **argv)
   
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
 //////////////////PART G
   tstart.tv_sec = 0;
@@ -199,7 +199,7 @@ int main(int arc, char **argv)
   
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
   //////////////////PART H
   tstart.tv_sec = 0;
@@ -215,7 +215,7 @@ int main(int arc, char **argv)
   
   current_utc_time(&tstop);
   
-  printf("%d %lu\n",nmult,tstop.tv_nsec - tstart.tv_nsec);
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
   
   }
