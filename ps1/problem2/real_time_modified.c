@@ -217,5 +217,15 @@ int main(int arc, char **argv)
   
   printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
 
+  ////////////////START/STOP CLOCK
+  tstart.tv_sec = 0;
+  tstart.tv_nsec = 0;
+  tstop.tv_sec = 0;
+  tstop.tv_nsec = 0;
+  
+  current_utc_time(&tstart);
+  current_utc_time(&tstop);
+  
+  printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
   
   }
