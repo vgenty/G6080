@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
   c3->SetLogx();
   
   auto ratt = p->ratio(pts);
-  ratt->GetYaxis()->SetRangeUser(pow(10,-14),pow(10,-3));
+  ratt->GetYaxis()->SetRangeUser(pow(10,1),pow(10,15));
   ratt->Draw("AL");
  
   c3->Modified();

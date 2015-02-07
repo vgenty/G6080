@@ -3,8 +3,11 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector> 
 
 #include "boost/math/special_functions/bessel.hpp"
+#include "boost/range/irange.hpp"
+#include "boost/range/adaptor/reversed.hpp"
 #include "TH1D.h"
 
 
@@ -12,13 +15,15 @@ class Bessel {
 
 private:
 
-    
+  
 public:
 
 
   Bessel() {}
   
   virtual ~Bessel() {}
+  
+  double recursion(const double x);
   
   void value(int v, double x) { std::cout << boost::math::cyl_bessel_i(v,x) << std::endl; }  
 };

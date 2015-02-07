@@ -46,7 +46,7 @@ TGraph* Plotter::ratio(std::map<double,double>& pts) {
     //std::cout << "(" << itr->first << "," << std::setprecision (15) << itr->second << ")" <<  " ratio " <<  (itr->second)/(pow(10,itr->first)*sin(_x0*pow(10,itr->first))/sin(_x0)) << std::endl;
     rat_->SetPoint((int)(itr->first - 2.0), 
 		   pow(10,itr->first), 
-		   fabs((itr->second)/(pow(10,itr->first)*sin(_x0*pow(10,itr->first))/sin(_x0))));
+		   fabs((pow(10,itr->first)*sin(_x0*pow(10,itr->first))/sin(_x0))/(itr->second)));
   }
   
   return rat_;

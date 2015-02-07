@@ -1,9 +1,11 @@
 #include "Bessel.h"
 #include <stdio.h>
+
 int main() {
   
   Bessel b;
   
-  b.value(2,5);
+  b.recursion(2.0);
+  b.value(2,2.0);
   return 0;
 }
