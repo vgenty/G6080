@@ -23,12 +23,15 @@ int main(int argc, char *argv[]) {
   Plotter *p = new Plotter();
   
   std::map<double,double> pts;
-  std::map<double,double>::iterator itr;
-  
-  for(int i = 2; i<=8; ++i)
-    pts[i] = r->value(pow(10,i));
-  
+  std::map<double,double>::iterator itrInitialStep;
 
+  std::map<double,double> ptsReducedStep;
+  std::map<double,double>::iterator itrReducedStep;
+  
+  for(int i = 2; i<=8; ++i) {
+    pts[i] = r->rsvalue(pow(10,i));
+    //ptsReducedStep[i] = r->rsvalue(pow(10,i));
+  }
   
   //Doing hardocred plots like this is idiocy
   TApplication tapp("tapp",&argc,argv);
