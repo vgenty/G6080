@@ -5,7 +5,7 @@ int main() {
   
   Bessel b;
   
-  b.recursion(2.0,11);
-  b.value(2,2.0);
+  std::cout << b.recursion(5.0,200);
+  //  b.value(2,2.0);
   return 0;
 }

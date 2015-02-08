@@ -38,7 +38,8 @@ int main(int argc, char *argv[]) {
 
   c1->cd();
   c1->SetLogx();
-  (p->plot(pts))->Draw("AL");
+  auto pp = p->plot(pts);
+  (pp)->Draw("AL");
   
   c1->Modified();
   c1->Update();
