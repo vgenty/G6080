@@ -1,1 +1,7 @@
-*.o *.so
+*.o 
+*.so
+1a
+1c
+executable
+*Dict*
+*.pyc

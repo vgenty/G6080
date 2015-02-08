@@ -16,12 +16,13 @@ public:
   TGraph* plot(std::map<double,double> & pts);
   TGraph* ratio(std::map<double,double> & pts);
   TGraph* error();
-  
-private:
+  TGraph* errorC(std::map<double,double>& ptsI);  
+
+  private:
   TGraph *tg_;
   TGraph *err_;
   TGraph *rat_;
-
+  
 protected:
   
 };

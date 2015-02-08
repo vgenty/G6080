@@ -25,7 +25,7 @@ public:
   
   double recursion(const double x, const int nn);
   
-  void value(int v, double x) { std::cout << std::setprecision (15)  << boost::math::cyl_bessel_i(v,x) << std::endl; }  
+  double value(int v, double x) { return boost::math::cyl_bessel_i(v,x); }  
 };
 
 // template <class T> inline T     std::three_vector<T>::X()    const { return fX;    }

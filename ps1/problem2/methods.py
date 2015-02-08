@@ -1,4 +1,5 @@
-from ROOT import gStyle, TCanvas, TGraph, TAxis, TGraph, gROOT, TH1D
+from ROOT import gStyle, TCanvas, TGraph, TAxis
+from ROOT import TGraph, gROOT, TH1D, TLegend, TPaveText
 from looks import *
 
 def Plotter(data3,data0,n,n_loops):
@@ -12,10 +13,12 @@ def Plotter(data3,data0,n,n_loops):
         maxx = 10
     if(n == 5 or n ==6):
         maxx = 50
-        maxx = 50
         
-    th3 = TH1D("O3", ";;", maxx*100,0,maxx)
-    th0 = TH1D("O0", ";;", maxx*100,0,maxx)
+    if(n == 8) :
+        maxx = 1
+        
+    th3 = TH1D("gcc -O3", ";;", maxx*100,0,maxx)
+    th0 = TH1D("gcc -O0", ";;", maxx*100,0,maxx)
     
     for k in xrange(len(data3)):
         th3.Fill(float(data3[k][n])/float(n_loops))
@@ -34,13 +37,46 @@ def Plotter(data3,data0,n,n_loops):
     th0.GetYaxis().CenterTitle()
 
     
+    title = TPaveText(0.30,.91,.70,1,"nbNDC")
+    title.SetFillColor(0);
+    title.SetFillStyle(0);
+    title.SetLineColor(0);
+    title.AddText(getTitle(n))
     
+    
+    tl = TLegend(0.6,0.4,0.9,0.8)
+    tl.AddEntry(th0,th0.GetName(),"f")
+    tl.AddEntry(0,"Mean: %0.2f ns" % th0.GetMean(),"")
+    tl.AddEntry(th3,th3.GetName(),"f")
+    tl.AddEntry(0,"Mean: %0.2f ns" % th3.GetMean(),"")
     th0.Draw()
     th3.Draw("SAMES")
+    tl.Draw()
+    title.Draw()
     
-
+   
     c1.Update()
     c1.Modified()
     raw_input('')
 
     
+def getTitle(n):
+    if  ( n == 0 ) :
+        return "c[i] = a[i] * b[i]"
+    elif( n == 1 ) :
+        return "c[i] += a[i] * b[i]"
+    elif( n == 2 ) :
+        return "c[i] += a[i]*b[2*i + 20]"
+    elif( n == 3 ) :
+        return "c[i] = a[i] / b[i]"
+    elif( n == 4 ) :
+        return "c[i] += a[i] / b[i]"
+    elif( n == 5 ) :
+        return "c[i] = std::sin(a[i])"
+    elif( n == 6 ) :
+        return "c[i] = std::exp(a[i])"
+    elif( n == 7 ) :
+        return "c[i] = std::sqrt(a[i])"
+    elif( n == 8 ) :
+        return "Stop and start clock / nloops"
+

@@ -5,20 +5,33 @@ Plotter::Plotter() {}
 Plotter::~Plotter() {}
 
 TGraph* Plotter::plot(std::map<double,double>& pts) {
-  tg_ = new TGraph();
+  TGraph *t = new TGraph();
   
   std::map<double,double>::iterator itr;
   
   for (itr = pts.begin(); itr != pts.end(); ++itr) {
     //std::cout << "(" << itr->first << "," << std::setprecision (15) << itr->second << ")" << std::endl;
-    tg_->SetPoint((int)(itr->first - 2.0), 
-		  pow(10,itr->first), 
-		  itr->second);
+    t->SetPoint((int)(itr->first - 2.0), 
+		pow(10,itr->first), 
+		itr->second);
   }
   
-  return tg_;  
+  return t;  
 }
 
+TGraph* Plotter::errorC(std::map<double,double>& ptsI) {
+  TGraph *t_ = new TGraph();
+  
+  double _x0 = pow(10,-6);
+  
+  for(int i = 2; i <= 8; ++i) {
+    t_->SetPoint(i-2,pow(10,i),fabs(2* (cos(pow(10,i)*_x0) - ptsI[i])/(cos(pow(10,i)*_x0) + ptsI[i])));
+    std::cout <<  std::setprecision(15) << fabs(2* (cos(pow(10,i)*_x0) - ptsI[i])/(cos(pow(10,i)*_x0) + ptsI[i])) << "\n";
+  }
+  
+  return t_;
+  
+}
 
 TGraph* Plotter::error() {
   err_ = new TGraph();
