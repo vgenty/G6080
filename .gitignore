@@ -6,3 +6,4 @@ executable
 *Dict*
 *.pyc
 *.pdf
+.DS_STORE
