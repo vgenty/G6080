@@ -14,13 +14,14 @@ clear all
 %  If the value for P is zero we don't truncate and
 %  run in MATLAB's native precision, which is double precision
 
-P = [0 6 8];
+P = [6];
 
 %  x contains the x values at which we will do the recursion
 %  N determines the value, cos(Nx), we will ultimately compute
 
-x = [ 1e-2 1e-4 1e-5] ;
-N = [  1e2 1e3 1e4 1e5];
+%x = [ 1e-2 1e-4 1e-5] ;
+x = [ 1e-6] ;
+N = [  1e2 1e3 1e4 1e5 1e6 1e7 1e8];
 
 %  Set format for printing variables in legend
 

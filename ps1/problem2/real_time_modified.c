@@ -227,5 +227,5 @@ int main(int arc, char **argv)
   current_utc_time(&tstop);
   
   printf("%lu\n",tstop.tv_nsec - tstart.tv_nsec);
-  
+  return 0; 
   }
