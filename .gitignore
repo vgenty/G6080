@@ -7,3 +7,4 @@ executable
 *.pyc
 *.pdf
 .DS_STORE
+
