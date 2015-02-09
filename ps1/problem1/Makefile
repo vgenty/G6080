@@ -22,6 +22,5 @@ Recursion.o: Recursion.cxx
 
 Plotter.o: Plotter.cxx
 	$(CXX) `root-config --glibs --cflags --libs` -c $^
-
 clean:
 	rm -rf *.o 1a 1c

@@ -22,7 +22,7 @@ private:
   int precision_;
   
   double roundd(double num) {
-    return floor(num * pow(10.0,precision_))/pow(10.0,precision_);
+    return floor(num * pow(10.0,precision_) + 0.5)/pow(10.0,precision_);
   }
   
 protected:

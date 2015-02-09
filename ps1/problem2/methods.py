@@ -15,7 +15,8 @@ def Plotter(data3,data0,n,n_loops):
         maxx = 50
         
     if(n == 8) :
-        maxx = 1
+        n_loops = 1
+        maxx = 100
         
     th3 = TH1D("gcc -O3", ";;", maxx*100,0,maxx)
     th0 = TH1D("gcc -O0", ";;", maxx*100,0,maxx)
@@ -78,5 +79,5 @@ def getTitle(n):
     elif( n == 7 ) :
         return "c[i] = std::sqrt(a[i])"
     elif( n == 8 ) :
-        return "Stop and start clock / nloops"
+        return "Stop and start clock"
 

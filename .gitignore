@@ -5,3 +5,4 @@
 executable
 *Dict*
 *.pyc
+*.pdf
