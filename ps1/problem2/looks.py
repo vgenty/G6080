@@ -56,5 +56,5 @@ def looks():
     gStyle.SetFrameBorderMode(0)
     gStyle.SetFrameLineWidth(2)
     gStyle.SetHistLineWidth(2)
-    gStyle.SetTitleOffset(1.16,'y')
+    gStyle.SetTitleOffset(1.15,'y')
     gStyle.SetTitleOffset(1.20,'x')
