@@ -25,7 +25,6 @@ TGraph* Plotter::errorC(std::map<double,double>& ptsI) {
   
   for(int i = 2; i <= 8; ++i) {
     t_->SetPoint(i-2,pow(10,i),fabs(2* (cos(pow(10,i)*_x0) - ptsI[i])/(cos(pow(10,i)*_x0) + ptsI[i])));
-    std::cout <<  std::setprecision(15) << fabs(2* (cos(pow(10,i)*_x0) - ptsI[i])/(cos(pow(10,i)*_x0) + ptsI[i])) << "\n";
   }
   
   return t_;
@@ -44,6 +43,30 @@ TGraph* Plotter::error() {
   }
   
   return err_;
+}
+
+TGraph* Plotter::error3() {
+  TGraph *tg__ = new TGraph();
+  
+  double _x0 = pow(10,-6);
+  
+  for(int i = 2; i <= 8; ++i) {
+    
+    double yvalue = 0.0;
+
+    for(int k = 1; k <= pow(10,i)-1; ++k) {
+      yvalue += (1/tan(k*_x0))/k;
+    }
+    
+    yvalue = yvalue * pow(10,i)*sin(pow(10,i)*_x0)*pow(10,-15);
+    
+
+    tg__->SetPoint(i-2,
+		   (double)pow(10,i),
+		   fabs(yvalue));
+    
+  }
+  return tg__;
 }
 
 TGraph* Plotter::ratio(std::map<double,double>& pts) {

@@ -18,9 +18,10 @@ public:
   
 private:
   const double x_ = pow(10,-6); // Initial angle value
-  double c_;       // Stores the value of cosine
-  int precision_;
+  double c_;                    // Stores the value of cosine
+  int precision_;               // Precision Value
   
+  //Round to precision_ decimal places
   double roundd(double num) {
     return floor(num * pow(10.0,precision_) + 0.5)/pow(10.0,precision_);
   }

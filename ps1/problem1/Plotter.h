@@ -16,7 +16,10 @@ public:
   TGraph* plot(std::map<double,double> & pts);
   TGraph* ratio(std::map<double,double> & pts);
   TGraph* error();
+
+  //Last couple functions are ghetto i'm sorry
   TGraph* errorC(std::map<double,double>& ptsI);  
+  TGraph* error3();  
 
   private:
   TGraph *tg_;
