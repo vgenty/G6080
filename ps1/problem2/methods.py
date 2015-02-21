@@ -3,7 +3,10 @@ from ROOT import TGraph, gROOT, TH1D, TLegend, TPaveText
 from looks import *
 
 def Plotter(data3,data0,n,n_loops):
-    looks()
+    looks_minos()
+    #looks()
+    #looks_atlas()
+    #looks_CmsTDR()
     maxx = 5
     
     if(n == 2): 
