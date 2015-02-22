@@ -86,9 +86,9 @@ class Planet:
                     self.v[i+1][j][k] = self.v[i][j][k] + self.dx * self.fv[i][j][k]
 
             # Calculate the force with updated values of r, v
-            for j in xrange(self.NP):
-                for k in self.xyz:
-                    self.F(i+1,k)
+            #for j in xrange(self.NP):
+            for k in self.xyz:
+                self.F(i+1,k)
 
             # Correct each planet r,v with update force
             for j in xrange(self.NP):

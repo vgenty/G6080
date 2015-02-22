@@ -32,14 +32,21 @@ private:
   std::vector<std::vector<boost::array<double, 3> > > _v;
 
   // force
-  std::vector<double> _f;
+  std::vector<std::vector<boost::array<double, 3> > > _f;
 
   // kinetic energy
   std::vector<double> _KEtot;
 
   void _restart();
   void _from_file();
+  double _force(const int&i,const int& j, const int& k);
 
+  void _F(const int& i);
+  void _K(const int& i);
+  
+  boost::array<double, 3> _image(const boost::array<double,3>& first,
+				 const boost::array<double,3>& second);
+  
 public:
 
   LArgon(int ns, int np, double p) : _m(48*_epsilon/(_sigma*_sigma))
@@ -60,13 +67,19 @@ public:
     for(auto k : boost::irange(0,ns)) {
       _r[k].resize(np);
       _v[k].resize(np);
+      _f[k].resize(np);
     }
   
-}
-
+  }
+  
   virtual ~LArgon() {}
   
   void evolve(const bool r);
+
+  //Getters
+  std::vector<double> KE() const; // KE
 };
+
+inline std::vector<double> LArgon::KE() const { return _KEtot; }
 
 #endif

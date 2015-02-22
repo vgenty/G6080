@@ -12,4 +12,13 @@ ROOT.gSystem.Load('../lib/libLArgon')
 b = ROOT.LArgon(int(100),int(1000),float(1.0))
 
 b.evolve(1)
-b.evolve(0)
+#b.evolve(0)
+tg = TGraph()
+
+
+for i in xrange(len(b.KE())) :
+    tg.SetPoint(i,i,b.KE()[i])
+
+tg.Draw("AL")
+
+raw_input('')
