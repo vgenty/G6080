@@ -50,13 +50,19 @@ public:
     _L = std::cbrt(np/p);
     _t = 0.032; // from Verlet paper
 
-    // Allocate vectors
-    _list.resize(ns);
+    // Prellocate vectors for speed
+    _r.resize(ns);
+    _v.resize(ns);
+    _f.resize(ns);  
     _KEtot.resize(ns);
     
-    for(auto& step : _list)
-      step.resize(np);
-  }
+    //Resize all vectors in the step
+    for(auto k : boost::irange(0,ns)) {
+      _r[k].resize(np);
+      _v[k].resize(np);
+    }
+  
+}
 
   virtual ~LArgon() {}
   

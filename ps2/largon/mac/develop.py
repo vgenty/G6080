@@ -6,7 +6,9 @@ from looks import *
 import sys,math
 ROOT.gSystem.Load('../lib/libLArgon')
 
-#Call largon constructor
+# Call largon constructor, if you change second two values 
+# immediately go to _restart() function
+
 b = ROOT.LArgon(int(100),int(1000),float(1.0))
 
 b.evolve(1)
