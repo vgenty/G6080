@@ -19,8 +19,8 @@ void LArgon::evolve(const bool r) {
     }
     
     _F(i+1);
-    // std::cout << "r[" << i << "][" << 0 << "] = {" << _r[i][0][0] << ","
-    // 	      << _r[i][0][1] << "," << _r[i][0][2] << "}\n";  
+    std::cout << "r[" << i << "][" << 0 << "] = {" << _r[i][0][0] << ","
+     	      << _r[i][0][1] << "," << _r[i][0][2] << "}\n";  
     
     
     for(auto j : boost::irange(0,_nparticles))
@@ -30,10 +30,10 @@ void LArgon::evolve(const bool r) {
     _K(i+1);
   }
   
-  for(auto cnt_ : boost::irange(0,_nparticles)) {
-    std::cout << "r[99][" << cnt_ << "] = {" << _v[99][cnt_][0] << ","
-	      << _v[99][cnt_][1] << "," << _v[99][cnt_][2] << "}\n";  
-  }
+  // for(auto cnt_ : boost::irange(0,_nparticles)) {
+  //   std::cout << "r[99][" << cnt_ << "] = {" << _v[99][cnt_][0] << ","
+  // 	      << _v[99][cnt_][1] << "," << _v[99][cnt_][2] << "}\n";  
+  // }
   
   // for i in xrange(self.nsteps-1):
 
@@ -64,7 +64,6 @@ void LArgon::evolve(const bool r) {
   //     self.K(i+1)
   //     self.P(i+1)
   //     self.E(i+1)
-  
   
   
 }
@@ -135,11 +134,12 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
 		 (img_[b] - _r[i][j][b]));
       }
       
-      ff_ += (_r[i][j][k] - img_[k])*(1/pow(de_,7) - 0.5*1/pow(de_,4));
+      ff_ += (_r[i][j][k] - img_[k])*(pow(de_,-7) - 0.5*pow(de_,-4));
     }
   }
   
-  return _m*ff_;
+  //return _m*ff_;
+  return ff_;
 
 }
 
