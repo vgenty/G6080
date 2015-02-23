@@ -7,7 +7,7 @@ import planet
 
 
 def main():
-    nsteps = 1000
+    nsteps = 5000
     
     NP  = 3                # num planets
     

@@ -19,53 +19,17 @@ void LArgon::evolve(const bool r) {
     }
     
     _F(i+1);
-    std::cout << "r[" << i << "][" << 0 << "] = {" << _r[i][0][0] << ","
-     	      << _r[i][0][1] << "," << _r[i][0][2] << "}\n";  
     
-    
+    //std::cout << std::setprecision(15) << "r[" << i << "][" << 0 << "] = {" << _r[i][50][0] << ","
+    // 	      << _r[i][50][1] << "," << _r[i][50][2] << "}\n";  
+        
     for(auto j : boost::irange(0,_nparticles))
       for(int k = 0; k < 3; ++k)
 	_v[i+1][j][k] = _v[i][j][k] + 0.5*(_f[i][j][k] + _f[i+1][j][k])*_t;
     
     _K(i+1);
+    _P(i+1);
   }
-  
-  // for(auto cnt_ : boost::irange(0,_nparticles)) {
-  //   std::cout << "r[99][" << cnt_ << "] = {" << _v[99][cnt_][0] << ","
-  // 	      << _v[99][cnt_][1] << "," << _v[99][cnt_][2] << "}\n";  
-  // }
-  
-  // for i in xrange(self.nsteps-1):
-
-  //     # Predict each planets r, v
-  //     for j in xrange(self.NP):
-  //         for k in self.xyz:
-  //             self.r[i+1][j][k] = self.r[i][j][k] + self.dx * self.fr[i][j][k]
-  //             self.v[i+1][j][k] = self.v[i][j][k] + self.dx * self.fv[i][j][k]
-
-  //     # Calculate the force with updated values of r, v
-  //     for j in xrange(self.NP):
-  //         for k in self.xyz:
-  //             self.F(i+1,k)
-
-  //     # Correct each planet r,v with update force
-  //     for j in xrange(self.NP):
-  //         for k in self.xyz:
-  //             self.r[i+1][j][k] = self.r[i][j][k] + self.dx/2.0 * (self.fr[i][j][k]
-  //                                                                  + self.fr[i+1][j][k])
-  //             self.v[i+1][j][k] = self.v[i][j][k] + self.dx/2.0 * (self.fv[i][j][k]
-  //                                                                  + self.fv[i+1][j][k])
-  //     # Update the force one more time for the next iteration
-  //     for j in xrange(self.NP):
-  //         for k in self.xyz:
-  //             self.F(i+1,k)
-                    
-  //     # Calculate total KE, PE, E
-  //     self.K(i+1)
-  //     self.P(i+1)
-  //     self.E(i+1)
-  
-  
 }
 
 void LArgon::_restart() {
@@ -79,7 +43,7 @@ void LArgon::_restart() {
 
   // TODO: tweak nside_ definition it's scary, lets get it working for _p = 1.0
   int nside_ = std::cbrt(_nparticles); 
-  double inc_   = _L/nside_;
+  double inc_   = _L/nside_*0.99;
   int    cnt_   = 0;
   
   std::cout << " nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
@@ -100,6 +64,7 @@ void LArgon::_restart() {
   
   _F(0);
   _K(0);
+  _P(0);
 }
 
 void LArgon::_from_file() {
@@ -109,8 +74,9 @@ void LArgon::_from_file() {
 
 void LArgon::_F(const int& i) {
   
-  for(int k = 0; k < 3; ++k) // for each direction
-    for(auto j : boost::irange(0,_nparticles)) // for each particle
+  //don't change this order will mess up image calculation
+  for(auto j : boost::irange(0,_nparticles)) // for each particle
+    for(int k = 0; k < 3; ++k) // for each direction
       _f[i][j][k] = _force(i,j,k);
 
   // for j in xrange(self.NP): # planet number
@@ -121,20 +87,23 @@ void LArgon::_F(const int& i) {
 
 double LArgon::_force(const int& i, const int& j, const int& k) {
   double ff_ = 0.0;
-  double de_ = 0.0;
-  boost::array<double, 3> img_ = {0.0,0.0,0.0};
+  double de_;
   
   for(auto l : boost::irange(0,_nparticles)) { // for each particle
+    de_ = 0.0; // reset the denominator before next particle...
     if(j != l) {
-      //compute the ``image" distance, feed it the two particles
-      img_ = _image(_r[i][j],_r[i][l]);
+      //compute the ``image" distance, feed it the two particles,
+      if(k == 0) { _img[l] = _image(_r[i][j],_r[i][l]); }
       
       for(int b = 0; b < 3; ++b) {
-	de_ +=  ((img_[b] - _r[i][j][b]) *
-		 (img_[b] - _r[i][j][b]));
+	de_ +=  ((_img[l][b] - _r[i][j][b]) *
+		 (_img[l][b] - _r[i][j][b]));
       }
       
-      ff_ += (_r[i][j][k] - img_[k])*(pow(de_,-7) - 0.5*pow(de_,-4));
+      //do i need the 48 here?
+      ff_ += 48 * (_r[i][j][k] - _img[l][k])*(pow(de_,-7) - 0.5*pow(de_,-4));
+      //if(j == 0)
+      //std::cout << k << " ~ dir ~ " << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << _img[l][0] << "," << _img[l][1] << "," << _img[l][2] << "} \ntotal f is: " << std::setprecision(15) << ff_ << "\n~~\n";
     }
   }
   
@@ -143,26 +112,28 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
 
 }
 
-boost::array<double, 3> LArgon::_image(const boost::array<double,3>& one_,
-				       const boost::array<double,3>& two_) {
+std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
+				     const std::array<double,3>& two_) {
   
-  boost::array<double, 3> img_ = {0.0,0.0,0.0};
+  std::array<double, 3> img_ = {0.0,0.0,0.0};
+  
+  // std::cout << "have the two particles: (" << one_[0] << "," << one_[1] << "," << one_[2] << ") - (" 
+  // 	    << two_[0] << "," << two_[1] << "," << two_[2] << ")\n";
   
   //loop over the three directions
-   for(auto i: boost::irange(0,3)) {
-     //decide which is shorter, the image or the real
-     if((fabs(two_[i]-one_[i]) <= fabs(two_[i]-_L-one_[i]))  &&
-	(fabs(two_[i]-one_[i]) <= fabs(two_[i]+_L-one_[i]))) {
-       img_[i] = two_[i];
-     } else if(fabs(two_[i]-_L-one_[i]) < fabs(two_[i]+_L-one_[i])){
-       img_[i] = two_[i]-_L;
-     }else {
-       img_[i] = two_[i]+_L;
-       
-     }
-   }
-   
-   return img_;
+  for(auto i: boost::irange(0,3)) {
+    //decide which is shorter, the image or the real
+    if((fabs(two_[i]-one_[i]) <= fabs(two_[i]-_L-one_[i]))  &&
+       (fabs(two_[i]-one_[i]) <= fabs(two_[i]+_L-one_[i]))) {
+      img_[i] = two_[i];
+    } else if(fabs(two_[i]-_L-one_[i]) < fabs(two_[i]+_L-one_[i])){
+      img_[i] = two_[i]-_L;
+    }else {
+      img_[i] = two_[i]+_L;
+    }
+  }
+  //  std::cout << "I calculated the image at " << img_[0] << "," << img_[1] << "," << img_[2] << "\n";
+  return img_;
 }
 
 void LArgon::_K(const int& i) { //for now this is like kinetic energy per mass
@@ -171,4 +142,32 @@ void LArgon::_K(const int& i) { //for now this is like kinetic energy per mass
 		      _v[i][l][1]*_v[i][l][1] +
 		      _v[i][l][2]*_v[i][l][2] );
   }
+}
+
+void LArgon::_P(const int& i) {
+  
+  for(auto j : boost::irange(0,_nparticles))
+    _PEtot[i] += (0.5)*_pe(i,j);
+
+}
+
+double LArgon::_pe(const int&i,const int& j) {
+
+  double pe_temp = 0.0;
+  double de_;
+  std::array<double,3> img_;
+  
+  for(auto l : boost::irange(0,_nparticles)){
+    de_ = 0.0;
+    if(j != l) {
+      img_ = _image(_r[i][j],_r[i][l]);
+      for(int b = 0; b < 3; ++b) {
+	de_ +=  ((img_[b] - _r[i][j][b]) *
+		 (img_[b] - _r[i][j][b]));
+      }
+      pe_temp += 4*(pow(de_,-6) - pow(de_,-3)) ;
+    }
+  }
+  
+  return pe_temp;
 }

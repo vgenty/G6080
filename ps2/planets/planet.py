@@ -68,6 +68,7 @@ class Planet:
         pe_temp = 0.0
         self.denom = 0.0
         for l in xrange(self.NP):
+            self.denom = 0.0
             if j is not l:
                 for b in self.xyz:
                     self.denom += (self.r[i][l][b] - self.r[i][j][b]) * \
