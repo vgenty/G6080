@@ -6,8 +6,7 @@
 #include <iomanip>
 
 #include "boost/range/irange.hpp"
-#include "boost/multi_array.hpp"  //Eh might use or not
-//#include "boost/array.hpp"
+#include "boost/random.hpp"
 
 class LArgon { 
 
@@ -55,8 +54,17 @@ private:
    //image location placeholder...
   std::vector<std::array<double, 3> > _img;
 
+  
+  //Random number object
+  //std::random_device _rd;
+  //std::mt19937 _rangen;
+  double _get_ran_double(double min, double max);
+  boost::mt19937 _rng;
+
 public:
   
+  LArgon() {}
+
   LArgon(int ns, int np, double p) : _m(48*_epsilon/(_sigma*_sigma))
   {
     _nparticles = np;
@@ -92,9 +100,16 @@ public:
   //Getters
   std::vector<double> KE() const; // KE
   std::vector<double> PE() const; // PE
+
+  std::vector<std::vector<std::array<double, 3> > > R() const;
+  std::vector<std::vector<std::array<double, 3> > > V() const;
   
 };
 inline std::vector<double> LArgon::KE() const { return _KEtot; }
 inline std::vector<double> LArgon::PE() const { return _PEtot; }
+inline std::vector<std::vector<std::array<double, 3> > > LArgon::R() const { return _r; }
+inline std::vector<std::vector<std::array<double, 3> > > LArgon::V() const { return _v; }
+
+
 
 #endif

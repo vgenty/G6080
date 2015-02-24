@@ -7,7 +7,7 @@ import planet
 
 
 def main():
-    nsteps = 5000
+    nsteps = 60000
     
     NP  = 3                # num planets
     
@@ -63,8 +63,12 @@ def main():
     te.SetLineColor(1)
     tme.Draw("AL")
 
+    
+    print len(p.KEtot)
+    
     raw_input('')
 
+    
     # print "==r=="
     # print p.r
     # print "==v=="

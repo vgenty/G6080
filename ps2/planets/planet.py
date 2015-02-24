@@ -6,7 +6,7 @@ class Planet:
         self.nsteps = nsteps
         self.NP     = NP
 
-        self.dx = np.power(2,-7.0)
+        self.dx = 2*np.power(10,-4.0)
     
         self.r  = np.zeros((nsteps,NP,3),dtype=float)    # initial position
         self.v  = np.zeros((nsteps,NP,3),dtype=float)    # initial velocity
@@ -28,7 +28,7 @@ class Planet:
         self.r[0][2][0] = -1.00
         
         self.v[0][1][1] =  1.00
-        self.v[0][2][1] =  -1.04        
+        self.v[0][2][1] =  1.04        
 
         # misc variables        
         self.xyz = xrange(3)
@@ -94,12 +94,16 @@ class Planet:
             # Correct each planet r,v with update force
             for j in xrange(self.NP):
                 for k in self.xyz:
-                    self.r[i+1][j][k] = self.r[i][j][k] + self.dx/2.0 * (self.fr[i][j][k]
-                                                                         + self.fr[i+1][j][k])
-                    self.v[i+1][j][k] = self.v[i][j][k] + self.dx/2.0 * (self.fv[i][j][k]
-                                                                         + self.fv[i+1][j][k])
+                    # self.r[i+1][j][k] = self.r[i][j][k] + self.dx/2.0 * (self.fr[i][j][k]
+                    #                                                      + self.fr[i+1][j][k])
+                    # self.v[i+1][j][k] = self.v[i][j][k] + self.dx/2.0 * (self.fv[i][j][k]
+                    #                                                      + self.fv[i+1][j][k])
+                    self.r[i+1][j][k] = self.r[i][j][k] + self.dx * (self.fr[i+1][j][k])
+                                                                     
+                    self.v[i+1][j][k] = self.v[i][j][k] + self.dx * (self.fv[i+1][j][k])
+                                                                         
             # Update the force one more time for the next iteration
-            for j in xrange(self.NP):
+            # for j in xrange(self.NP):
                 for k in self.xyz:
                     self.F(i+1,k)
                     

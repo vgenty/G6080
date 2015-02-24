@@ -35,15 +35,34 @@ void LArgon::evolve(const bool r) {
 void LArgon::_restart() {
 
   // Set initial velocity to zero
+  std::array<double,3> totV_ = {0.0,0.0,0.0};
+
+  for(auto j : boost::irange(0,_nparticles)) {
+    _v[0][j] = {_get_ran_double(-2,2),
+		_get_ran_double(-2,2),
+		_get_ran_double(-2,2)};
+    
+    totV_[0] += _v[0][j][0];
+    totV_[1] += _v[0][j][1];
+    totV_[2] += _v[0][j][2];
+  }
+
+  for(int b = 0; b < 3; ++b)
+    totV_[b] /= _nparticles;
+
   for(auto j : boost::irange(0,_nparticles))
-    _v[0][j] = {0.0,0.0,0.0};
-  
+    for(int b = 0; b < 3; ++b)
+      _v[0][j][b] -= totV_[b];
+	
+           
+     
+
   // Figure out how we will partition all the particles
   // we can put a cube root of the number of particles in each direction
 
   // TODO: tweak nside_ definition it's scary, lets get it working for _p = 1.0
   int nside_ = std::cbrt(_nparticles); 
-  double inc_   = _L/nside_*0.99;
+  double inc_   = _L/nside_;
   int    cnt_   = 0;
   
   std::cout << " nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
@@ -171,3 +190,11 @@ double LArgon::_pe(const int&i,const int& j) {
   
   return pe_temp;
 }
+
+ double LArgon::_get_ran_double(double min, double max)
+ {
+   boost::uniform_real<double> u(min, max);
+   boost::variate_generator<boost::mt19937&, boost::uniform_real<double> > gen(_rng, u);
+   return gen();
+ }
+ 

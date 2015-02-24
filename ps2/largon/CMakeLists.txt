@@ -8,7 +8,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "")
 set(CMAKE_EXE_LINKER_FLAGS "")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS random)
 include_directories("${Boost_INCLUDE_DIRS}")
 link_directories("${Boost_LIBRARY_DIR}")
 MESSAGE("Boost information:") 
