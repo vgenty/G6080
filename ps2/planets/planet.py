@@ -6,7 +6,7 @@ class Planet:
         self.nsteps = nsteps
         self.NP     = NP
 
-        self.dx = 2*np.power(10,-4.0)
+        self.dx = 2.0*np.power(10,-4.0)
     
         self.r  = np.zeros((nsteps,NP,3),dtype=float)    # initial position
         self.v  = np.zeros((nsteps,NP,3),dtype=float)    # initial velocity
@@ -38,10 +38,9 @@ class Planet:
         # initialize Forces, KE and PE
         
         for k in self.xyz:
-            self.F(0,k)
-
+            self.F(0,k,1)
+            
         self.K(0)
-        self.P(0)
         self.E(0)
 
         #self.PE(0)
@@ -60,22 +59,22 @@ class Planet:
         return float(0.5 * self.m[j] * ( self.v[i][j][0]*self.v[i][j][0] +  
                                          self.v[i][j][1]*self.v[i][j][1] + 
                                          self.v[i][j][2]*self.v[i][j][2]  ))
-    def P(self,i):
-        for j in xrange(self.NP):
-            self.PEtot[i] += (0.5)*self.pe(i,j)
+    # def P(self,i):
+    #     for j in xrange(self.NP):
+    #         self.PEtot[i] += (0.5)*self.pe(i,j)
         
-    def pe(self,i,j):
-        pe_temp = 0.0
-        self.denom = 0.0
-        for l in xrange(self.NP):
-            self.denom = 0.0
-            if j is not l:
-                for b in self.xyz:
-                    self.denom += (self.r[i][l][b] - self.r[i][j][b]) * \
-                                  (self.r[i][l][b] - self.r[i][j][b])
-                pe_temp += (-1.0)*self.m[j]*self.m[l] / np.sqrt(self.denom)
+    # def pe(self,i,j):
+    #     pe_temp = 0.0
+    #     self.denom = 0.0
+    #     for l in xrange(self.NP):
+    #         self.denom = 0.0
+    #         if j is not l:
+    #             for b in self.xyz:
+    #                 self.denom += (self.r[i][l][b] - self.r[i][j][b]) * \
+    #                               (self.r[i][l][b] - self.r[i][j][b])
+    #             pe_temp += (-1.0)*self.m[j]*self.m[l] / np.sqrt(self.denom)
         
-        return pe_temp
+    #     return pe_temp
 
     def evolve(self):
         for i in xrange(self.nsteps-1):
@@ -89,7 +88,7 @@ class Planet:
             # Calculate the force with updated values of r, v
             #for j in xrange(self.NP):
             for k in self.xyz:
-                self.F(i+1,k)
+                self.F(i+1,k,2)
 
             # Correct each planet r,v with update force
             for j in xrange(self.NP):
@@ -104,27 +103,30 @@ class Planet:
                                                                          
             # Update the force one more time for the next iteration
             # for j in xrange(self.NP):
-                for k in self.xyz:
-                    self.F(i+1,k)
+            for k in self.xyz:
+                self.F(i+1,k,1)
                     
             # Calculate total KE, PE, E
             self.K(i+1)
-            self.P(i+1)
             self.E(i+1)
 
-    def F(self,i,k):
+    def F(self,i,k,p):
         for j in xrange(self.NP): # planet number
             self.fr[i][j][k] = self.v[i][j][k] 
-            self.fv[i][j][k] = self.force(i,j,k) #calculate force on j'th planet along k direction
+            self.fv[i][j][k] = self.force(i,j,k,p) #calculate force on j'th planet along k direction
             
-    def force(self,i,j,k):        # k direction
+    def force(self,i,j,k,p):        # k direction
         self.ff = 0.0             # force on planet j
+        
         for l in xrange(self.NP): # planet number l
             self.denom = 0.0
             if j is not l:
                 for b in self.xyz:
                     self.denom += (self.r[i][l][b] - self.r[i][j][b]) * \
                                   (self.r[i][l][b] - self.r[i][j][b])
+
+                if k is 0 and p is 1: 
+                    self.PEtot[i] += (-0.5)*self.m[j]*self.m[l] / np.sqrt(self.denom)
                     
                 self.ff += (self.m[l] * (self.r[i][j][k] - self.r[i][l][k]) / np.power(self.denom,1.5))
 

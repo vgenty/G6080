@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 
 #include "boost/range/irange.hpp"
 #include "boost/random.hpp"
@@ -42,11 +43,11 @@ private:
   void _from_file();
 
   double _force(const int&i,const int& j, const int& k);
-  double _pe(const int&i,const int& j);
+  //double _pe(const int&i,const int& j);
   
   void _F(const int& i);
   void _K(const int& i);
-  void _P(const int& i);
+  //void _P(const int& i); // Force will now to _P
   
   std::array<double, 3> _image(const std::array<double,3>& first,
 			       const std::array<double,3>& second);
@@ -54,10 +55,10 @@ private:
    //image location placeholder...
   std::vector<std::array<double, 3> > _img;
 
-  
-  //Random number object
+  //Random number object - use boost even though it's in C++11
   //std::random_device _rd;
   //std::mt19937 _rangen;
+  
   double _get_ran_double(double min, double max);
   boost::mt19937 _rng;
 
@@ -65,7 +66,7 @@ public:
   
   LArgon() {}
 
-  LArgon(int ns, int np, double p) : _m(48*_epsilon/(_sigma*_sigma))
+  LArgon(int ns, int np, double p) : _m(_epsilon/(_sigma*_sigma))
   {
     _nparticles = np;
     _nsteps     = ns;
@@ -95,6 +96,7 @@ public:
   
   virtual ~LArgon() {}
   
+  // Public evolve
   void evolve(const bool r);
 
   //Getters

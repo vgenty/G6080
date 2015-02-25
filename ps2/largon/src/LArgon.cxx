@@ -28,7 +28,7 @@ void LArgon::evolve(const bool r) {
 	_v[i+1][j][k] = _v[i][j][k] + 0.5*(_f[i][j][k] + _f[i+1][j][k])*_t;
     
     _K(i+1);
-    _P(i+1);
+    //_P(i+1);
   }
 }
 
@@ -38,9 +38,9 @@ void LArgon::_restart() {
   std::array<double,3> totV_ = {0.0,0.0,0.0};
 
   for(auto j : boost::irange(0,_nparticles)) {
-    _v[0][j] = {_get_ran_double(-2,2),
-		_get_ran_double(-2,2),
-		_get_ran_double(-2,2)};
+    _v[0][j] = {_get_ran_double(-0.5,0.5),
+		_get_ran_double(-0.5,0.5),
+		_get_ran_double(-0.5,0.5)};
     
     totV_[0] += _v[0][j][0];
     totV_[1] += _v[0][j][1];
@@ -53,37 +53,63 @@ void LArgon::_restart() {
   for(auto j : boost::irange(0,_nparticles))
     for(int b = 0; b < 3; ++b)
       _v[0][j][b] -= totV_[b];
-	
-           
-     
 
+  
   // Figure out how we will partition all the particles
   // we can put a cube root of the number of particles in each direction
 
   // TODO: tweak nside_ definition it's scary, lets get it working for _p = 1.0
-  int nside_ = std::cbrt(_nparticles); 
+  int nside_ = floor(std::cbrt(_nparticles)); 
   double inc_   = _L/nside_;
   int    cnt_   = 0;
+  double extra_ = _nparticles - pow(nside_,3.0);
   
+  std::cout << "extra_: " << extra_ << std::endl;
+  std::cout << "pre density: " << pow(nside_/_L,3.0) << std::endl;
   std::cout << " nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
   for(auto x : boost::irange(0,nside_)) { // x direction
     for(auto y : boost::irange(0,nside_)) { // y direction
       for(auto z : boost::irange(0,nside_)) { // z direction
-  	_r[0][cnt_] = {x*inc_, y*inc_, z*inc_};
-	// std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
-	// 	  << _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
+	_r[0][cnt_] = {x*inc_,y*inc_,z*inc_};
+	//std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
+	//	  << _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
 	cnt_++;
       }
     }
   }
-  
-  std::cout << "I put: " << cnt_ << " particles in the box" << std::endl;
 
+  //put the extras in like in fcc
+  if(extra_) {
+    for(auto x : boost::irange(0,nside_-1)) { // x direction
+      for(auto y : boost::irange(0,nside_-1)) { // y direction
+ 	for(auto z : boost::irange(0,nside_-1)) { // z direction
+ 	  _r[0][cnt_] = {(0.5+x)*inc_,(0.5+y)*inc_,(0.5+z)*inc_};
+ 	  //std::cout << "cnt_ " << cnt_;
+ 	  //std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
+	    //<< _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
+ 	  
+	  if(_nparticles == cnt_) 
+ 	    goto LABEL;
+	  
+  	  cnt_++;
+  	}
+       }
+    }
+  }
+
+  LABEL:
+  std::cout << "post density: " << cnt_/pow(_L,3.0) << std::endl;
+  
+  if(_nparticles != cnt_){
+    std::cout << "couldn't get the required density :- (" << std::endl;
+    std::exit(0);
+  }
+  std::cout << "I put: " << cnt_ << " particles in the box" << std::endl;
   std::cout << "Initializing force\n" << std::endl;
   
   _F(0);
   _K(0);
-  _P(0);
+  //_P(0);
 }
 
 void LArgon::_from_file() {
@@ -119,10 +145,13 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
 		 (_img[l][b] - _r[i][j][b]));
       }
       
-      //do i need the 48 here?
+      if(k == 0) //update the potential only when x coordinate is seen
+	_PEtot[i] += 4*(0.5)*(pow(de_,-6) - pow(de_,-3)) ;
+
+      //do i need the 48 here ~ sure why not?
       ff_ += 48 * (_r[i][j][k] - _img[l][k])*(pow(de_,-7) - 0.5*pow(de_,-4));
-      //if(j == 0)
-      //std::cout << k << " ~ dir ~ " << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << _img[l][0] << "," << _img[l][1] << "," << _img[l][2] << "} \ntotal f is: " << std::setprecision(15) << ff_ << "\n~~\n";
+      // if(j == 0)
+      // 	std::cout << k << " ~ dir ~ " << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << _img[l][0] << "," << _img[l][1] << "," << _img[l][2] << "} \ntotal f is: " << std::setprecision(15) << ff_ << "\n~~\n";
     }
   }
   
@@ -163,33 +192,35 @@ void LArgon::_K(const int& i) { //for now this is like kinetic energy per mass
   }
 }
 
-void LArgon::_P(const int& i) {
+// void LArgon::_P(const int& i) {
   
-  for(auto j : boost::irange(0,_nparticles))
-    _PEtot[i] += (0.5)*_pe(i,j);
+//   for(auto j : boost::irange(0,_nparticles))
+//     _PEtot[i] += (0.5)*_pe(i,j);
 
-}
+// }
 
-double LArgon::_pe(const int&i,const int& j) {
+// double LArgon::_pe(const int&i,const int& j) {
 
-  double pe_temp = 0.0;
-  double de_;
-  std::array<double,3> img_;
+//   double pe_temp = 0.0;
+//   double de_;
+//   std::array<double,3> img_;
   
-  for(auto l : boost::irange(0,_nparticles)){
-    de_ = 0.0;
-    if(j != l) {
-      img_ = _image(_r[i][j],_r[i][l]);
-      for(int b = 0; b < 3; ++b) {
-	de_ +=  ((img_[b] - _r[i][j][b]) *
-		 (img_[b] - _r[i][j][b]));
-      }
-      pe_temp += 4*(pow(de_,-6) - pow(de_,-3)) ;
-    }
-  }
+//   for(auto l : boost::irange(0,_nparticles)){
+//     de_ = 0.0;
+//     if(j != l) {
+//       img_ = _image(_r[i][j],_r[i][l]);
+//       for(int b = 0; b < 3; ++b) {
+// 	de_ +=  ((img_[b] - _r[i][j][b]) *
+// 		 (img_[b] - _r[i][j][b]));
+//       }
+//       pe_temp += 4*(pow(de_,-6) - pow(de_,-3)) ;
+//       if(j == 0)
+// 	std::cout << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << img_[0] << "," << img_[1] << "," << img_[2] << "} \ntotal pe is: " << std::setprecision(15) << pe_temp << "\n~~\n";
+//     }
+//   }
   
-  return pe_temp;
-}
+//   return pe_temp;
+// }
 
  double LArgon::_get_ran_double(double min, double max)
  {
