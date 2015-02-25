@@ -23,6 +23,7 @@ private:
   int _nsteps;
   double _L;
   double _t;
+  double _Tinit;
 
   // int step, int particle number, double 3 vector
 
@@ -35,9 +36,10 @@ private:
   // force
   std::vector<std::vector<std::array<double, 3> > > _f;
 
-  // kinetic energy 
+  // Energy
   std::vector<double> _KEtot;
   std::vector<double> _PEtot;
+  std::vector<double> _Ttot;
 
   void _restart();
   void _from_file();
@@ -47,6 +49,7 @@ private:
   
   void _F(const int& i);
   void _K(const int& i);
+  void _T(const int& i);
   //void _P(const int& i); // Force will now to _P
   
   std::array<double, 3> _image(const std::array<double,3>& first,
@@ -64,9 +67,9 @@ private:
 
 public:
   
-  LArgon() {}
+  LArgon() {} //Default constructor for ROOT
 
-  LArgon(int ns, int np, double p) : _m(_epsilon/(_sigma*_sigma))
+  LArgon(int ns, int np, double p, double T) : _m(_epsilon/(_sigma*_sigma))
   {
     _nparticles = np;
     _nsteps     = ns;
@@ -74,7 +77,7 @@ public:
     _L = std::cbrt(np/p);
     //_t = 0.032; // from Verlet paper
     _t = 0.01; // from Bob
-
+    _Tinit = T;
     // Prellocate vectors for speed
     _r.resize(ns);
     _v.resize(ns);
@@ -82,7 +85,8 @@ public:
     
     _KEtot.resize(ns);
     _PEtot.resize(ns);
-    
+    _Ttot.resize(ns);
+
     //Resize all vectors in the step
     for(auto k : boost::irange(0,ns)) {
       _r[k].resize(np);
@@ -102,6 +106,7 @@ public:
   //Getters
   std::vector<double> KE() const; // KE
   std::vector<double> PE() const; // PE
+  std::vector<double> T() const; // T
 
   std::vector<std::vector<std::array<double, 3> > > R() const;
   std::vector<std::vector<std::array<double, 3> > > V() const;
@@ -109,6 +114,8 @@ public:
 };
 inline std::vector<double> LArgon::KE() const { return _KEtot; }
 inline std::vector<double> LArgon::PE() const { return _PEtot; }
+inline std::vector<double> LArgon::T() const { return _Ttot; }
+
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::R() const { return _r; }
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::V() const { return _v; }
 

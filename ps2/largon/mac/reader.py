@@ -23,19 +23,22 @@ def main():
     looks_minos()
 
     rr = initialR(b)
-    vv = initialV(b,-2,2)
+    vv = initialV(b,-3,3)
+    tt = TT(b)
 
     c1 = TCanvas()
     c1.cd()    
-    rr[0][0].Draw()
+    #rr[0][0].Draw()
+    vv[0].Draw()
     
     c2 = TCanvas()
     c2.cd()    
-    rr[0][1].Draw()
-    
+    #rr[0][1].Draw()
+    vv[1].Draw()
+
     c3 = TCanvas()
     c3.cd()    
-    rr[0][2].Draw()
+    vv[2].Draw()
     
 
     
@@ -52,6 +55,11 @@ def main():
     rr[1].SetMarkerStyle(20)
     rr[1].Draw("P")
     
+
+    c6 = TCanvas()
+    c6.cd()
+    tt.Draw("AL")
+
     raw_input('')
     
 def initialR(b):
@@ -94,7 +102,7 @@ def initialV(b,vmin, vmax):
 
     c = 0
     for i in b.V():
-        if(c == 0):
+        if(c == 99):
             for j in i:
                 tV[0].Fill(j[0])
                 tV[1].Fill(j[1])
@@ -113,15 +121,24 @@ def E(b):
     tm.Add(tg1,"L")
     tm.Add(tg2,"L")
 
-    print len(b.KE())
+    #print len(b.KE())
     
     for i in xrange(len(b.KE())) :
         tg1.SetPoint(i,i,b.KE()[i])
         tg2.SetPoint(i,i,b.PE()[i])
-        print "TOTAL E = %f, energy now = %f, diff = %f" % (b.PE()[0]+b.KE()[0], b.PE()[i]+b.KE()[i], (b.PE()[0]+b.KE()[0]) - (b.PE()[i]+b.KE()[i]))
+       #print "TOTAL E = %f, energy now = %f, diff = %f" % (b.PE()[0]+b.KE()[0], b.PE()[i]+b.KE()[i], (b.PE()[0]+b.KE()[0]) - (b.PE()[i]+b.KE()[i]))
     
     return tm
+
+def TT(b):
+    tgT = TGraph()
     
+    for i in xrange(len(b.T())):
+        tgT.SetPoint(i,i,b.T()[i])
+
+    tgT.SetTitle(";step;T")
+    return tgT
+
 if __name__ == '__main__' :
     main()
     

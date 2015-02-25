@@ -28,8 +28,40 @@ void LArgon::evolve(const bool r) {
 	_v[i+1][j][k] = _v[i][j][k] + 0.5*(_f[i][j][k] + _f[i+1][j][k])*_t;
     
     _K(i+1);
+    _T(i+1);
     //_P(i+1);
   }
+  std::cout << "Simulation finished calculating final pressure value" << std::endl;
+  double p_ = 0.0;
+  int f_ = _nsteps-1;
+  std::array<double , 3> img_;
+  double de_ = 0.0;
+  double fe_ = 0.0;
+  //Sim is done lets print to the screen the pressure...
+  for(auto j : boost::irange(0,_nparticles)){
+    for(auto l : boost::irange(0,_nparticles)){
+      de_ = 0.0;
+      fe_ = 0.0;
+      if(j != l) {
+	img_ = _image(_r[f_][j],_r[f_][l]);
+	for(int b = 0; b < 3; ++b) {
+	  de_ +=  ((img_[b] - _r[f_][j][b]) *
+		   (img_[b] - _r[f_][j][b]));
+	}
+	// for(int b = 0; b<3; ++b)
+	//   fe_ += (_r[f_][j][b] - img_[b])*(_r[f_][j][b] - img_[b]);
+	
+	//p_ += sqrt(de_) * sqrt(fe_) * fabs(48*(pow(de_,-7) - 0.5*pow(de_,-4))); 
+	p_ += sqrt(de_)*fabs(48*(pow(sqrt(de_),-13) - 0.5*pow(sqrt(de_),-7))); 
+	
+      }
+    }
+  }
+
+  //p_ *= (1/(6*_nparticles*_Ttot[f_]));
+  p_ *= (1/(6*_nparticles*_Ttot[f_]));
+  p_ = 1 - p_;
+  std::cout << "p_: " << p_ << std::endl;
 }
 
 void LArgon::_restart() {
@@ -37,24 +69,40 @@ void LArgon::_restart() {
   // Set initial velocity to zero
   std::array<double,3> totV_ = {0.0,0.0,0.0};
 
+  //Some range of initial velocities
   for(auto j : boost::irange(0,_nparticles)) {
-    _v[0][j] = {_get_ran_double(-0.5,0.5),
-		_get_ran_double(-0.5,0.5),
-		_get_ran_double(-0.5,0.5)};
+    _v[0][j] = {_get_ran_double(-1.0,1.0),
+		_get_ran_double(-1.0,1.0),
+		_get_ran_double(-1.0,1.0)};
     
     totV_[0] += _v[0][j][0];
     totV_[1] += _v[0][j][1];
     totV_[2] += _v[0][j][2];
   }
 
+  // Make the cm velocity zero
   for(int b = 0; b < 3; ++b)
     totV_[b] /= _nparticles;
 
+
+  double sumsqs_ = 0.0;
+  //remove CM motion
+  for(auto j : boost::irange(0,_nparticles)) {
+    for(int b = 0; b < 3; ++b) {
+      _v[0][j][b] -= totV_[b];
+      sumsqs_ += _v[0][j][b]*_v[0][j][b];
+    }
+  }
+  
+  double scale_ = sqrt( 3 * (_nparticles) * _Tinit / sumsqs_ );
   for(auto j : boost::irange(0,_nparticles))
     for(int b = 0; b < 3; ++b)
-      _v[0][j][b] -= totV_[b];
-
+      _v[0][j][b] *= scale_;
+    
   
+  //Scale all velocities to initial temperature
+  
+
   // Figure out how we will partition all the particles
   // we can put a cube root of the number of particles in each direction
 
@@ -109,6 +157,7 @@ void LArgon::_restart() {
   
   _F(0);
   _K(0);
+  _T(0);
   //_P(0);
 }
 
@@ -192,6 +241,17 @@ void LArgon::_K(const int& i) { //for now this is like kinetic energy per mass
   }
 }
 
+void LArgon::_T(const int& i) {
+  
+  double squarev_ = 0.0;
+  for(auto j : boost::irange(0,_nparticles))
+    squarev_ += (_v[i][j][0]*_v[i][j][0] +
+		 _v[i][j][1]*_v[i][j][1] +
+		 _v[i][j][2]*_v[i][j][2]);
+  
+  _Ttot[i] = squarev_ / (3* (_nparticles ));
+
+}
 // void LArgon::_P(const int& i) {
   
 //   for(auto j : boost::irange(0,_nparticles))
@@ -229,3 +289,4 @@ void LArgon::_K(const int& i) { //for now this is like kinetic energy per mass
    return gen();
  }
  
+
