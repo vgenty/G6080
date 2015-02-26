@@ -30,6 +30,7 @@ The lowest order corrector-predictor method is implemented in Python with the Nu
   \caption{\label{fig1} Plots for Part 1. Top pane are the coordinate locations of the three planets the green, red, and black lines represent the trajectories of the sun and two orbiting planets. The bottom left pane shows the total kinetic and potential energies. The bottom right shows the deviation of the total energy as a function of time. The lines above and below represent 1\% bounds on the initial total energy.}
 \end{figure}
 The trajectory, kinetic, potential, and total energy are plotted in Fig. \ref{fig1}.
+\clearpage
 \subsection{Part 2}
 With the initial conditions specified in Part 2 and a step size of 60,000, the predictor-corrector algorithm fails for short range interactions shown in Fig. \ref{fig2}.
 \begin{figure}[h]
@@ -40,9 +41,35 @@ With the initial conditions specified in Part 2 and a step size of 60,000, the p
 \hfill
   \caption{\label{fig2} Plots for part 2. Top pane shows the three trajectories of the planets. The energy spectrum near the end of the simulation blows up as one of the planet is ejected out of a bound orbit.}
 \end{figure}
-One of the planets is ejected from an initially bound orbit via two interactions with the second planet, and a fatal interaction with the massive sun. The total energy of the system explodes in the final steps.
+One of the planets is ejected from an initially bound orbit via two interactions with the second planet, and a fatal interaction with the massive sun. The total energy of the system explodes in the final steps as the step size on the predictor corrector algorithm is too large.
+\clearpage
 \subsection{Part 3}
-d
+In order to see the two planet interactions in the previous part we increase the number of iterations to {\bf 120,000} and decrease the step size to $\mathbf{4.0\times10^{-5}}$. I increased the evolution time past 75,000 as stated in the problem (an increase of 25\%) in order to observe the planets interact twice in their orbits around the sun. Reducing the step size greatly constrained deviation of the total energy. The step size must be much smaller due to the large predicted velocity and force during the close interaction when the potential energy is strongly negative. The results are plotted in Fig. \ref{fig3}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/3r.eps}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/3es.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/3ee.eps}}\\
+\hfill
+  \caption{\label{fig3} Plots for Part 3. Energy conservation is improved via the reduction in step size.}
+\end{figure}
+With an improved predictor-corrector algorithm, for example a trapezoid correction, would greatly enhance the integration convergence.
+\clearpage
+\subsection{Part 4}
+The gravitational assist simulation is set up with the initial rocket conditions,
+\begin{align*}
+v_x &= -8.0 \\
+v_y &= 1.225.
+\end{align*}
+This set of initial conditions ensures the rocket slingshots off Venus rather than the much more massive sun. Plots of the trajectories of the Earth (red), Venus (black), and the rocket (blue) show the rocket's liftoff from near Earth, it's pass around venus and the ``sling shot'' effect in Fig. \ref{fig4}.
+\begin{figure}[h]
+  \centering
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/4r.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/4r2.eps}}\\
+\hfill
+  \caption{\label{fig4} Plots for Part 4. The left pane shows the x-y positions of the three objects. The right pane is a close of the Venus-rocket interaction.}
+\end{figure}
+\clearpage
+\section{Problem 2 - Liquid Argon}
 
-\section{Problem 2 - LArgon}
 \end{document}

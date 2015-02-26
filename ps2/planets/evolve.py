@@ -8,9 +8,9 @@ import planet
 
 
 def main():
-    nsteps = 200000
+    nsteps = 30000
     
-    NP  = 3                # num planets
+    NP  = 4                # num planets
     
     p = planet.Planet(nsteps,NP)
     
@@ -25,20 +25,28 @@ def main():
     tg1 = TGraph()
     tg2 = TGraph()
     tg3 = TGraph()
+    if(NP == 4):
+        tg4 = TGraph()
     tmg = TMultiGraph()
     tmg.Add(tg1,"L")
     tmg.Add(tg2,"L")
     tmg.Add(tg3,"L")
+    if(NP == 4):
+        tmg.Add(tg4,"L")
     
     for i in xrange(len(p.r)):
         tg1.SetPoint(i,p.r[i][0][0],p.r[i][0][1])
         tg2.SetPoint(i,p.r[i][1][0],p.r[i][1][1])
         tg3.SetPoint(i,p.r[i][2][0],p.r[i][2][1])
+        if(NP == 4):
+            tg4.SetPoint(i,p.r[i][3][0],p.r[i][3][1])
         
     tg1.SetLineColor(3)
     tg2.SetLineColor(2)
     tg3.SetLineColor(1)
-    
+    if(NP == 4):
+        tg4.SetLineColor(4)
+
 
     tmg.Draw("A")
 

@@ -6,14 +6,15 @@ class Planet:
         self.nsteps = nsteps
         self.NP     = NP
 
-        self.dx = 1.0*np.power(10,-4.0)
+        self.dx = 1.0*np.power(10,-5.0)
     
         self.r  = np.zeros((nsteps,NP,3),dtype=float)    # initial position
         self.v  = np.zeros((nsteps,NP,3),dtype=float)    # initial velocity
         
         self.m  = np.array([1.00,
                             0.01,
-                            0.01])
+                            0.005,
+                            0.00001])
         
         self.KEtot = np.zeros(nsteps,dtype=float)
         self.PEtot = np.zeros(nsteps,dtype=float)
@@ -25,10 +26,13 @@ class Planet:
         # initialize variables position and velocity
 
         self.r[0][1][0] =  1.00
-        self.r[0][2][0] = -1.00
+        self.r[0][2][0] =  2.0/3.0
+        self.r[0][3][0] =  0.99
         
         self.v[0][1][1] =  1.00
-        self.v[0][2][1] =  1.04        
+        self.v[0][2][1] =  np.power((2.0/3.0),-0.5)
+        self.v[0][3][0] =  -8.0   # x velocity
+        self.v[0][3][1] =   1.225 # y velocity
 
         # misc variables        
         self.xyz = xrange(3)
