@@ -52,7 +52,7 @@ void LArgon::evolve(const bool r) {
 	//   fe_ += (_r[f_][j][b] - img_[b])*(_r[f_][j][b] - img_[b]);
 	
 	//p_ += sqrt(de_) * sqrt(fe_) * fabs(48*(pow(de_,-7) - 0.5*pow(de_,-4))); 
-	p_ += sqrt(de_)*fabs(48*(pow(sqrt(de_),-13) - 0.5*pow(sqrt(de_),-7))); 
+	p_ += fabs(48*(pow(de_,-6) - 0.5*pow(de_,-3))); 
 	
       }
     }

@@ -6,7 +6,7 @@ class Planet:
         self.nsteps = nsteps
         self.NP     = NP
 
-        self.dx = 2.0*np.power(10,-4.0)
+        self.dx = 1.0*np.power(10,-4.0)
     
         self.r  = np.zeros((nsteps,NP,3),dtype=float)    # initial position
         self.v  = np.zeros((nsteps,NP,3),dtype=float)    # initial velocity
