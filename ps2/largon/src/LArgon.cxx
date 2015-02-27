@@ -197,7 +197,8 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
       }
       
       if(k == 0){ //update the potential only when x coordinate is seen
-	_PEtot[i]  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3)) ;
+	_PEtot[i]  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3));
+	_Ptot[i]   += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
       }
       ff_ += 48 * (_r[i][j][k] - _img[l][k])*(pow(de_,-7) - 0.5*pow(de_,-4));
       // if(j == 0)
@@ -209,28 +210,8 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
   
 }
 void LArgon::_P(const int& i) { // Force will now to _P
-  double de_;
-  
-  std::array<double,3> _img;  
-  for(auto j : boost::irange(0,_nparticles)) { // for each particle
-    for(auto l : boost::irange(0,_nparticles)) { // for each particle
-      de_ = 0.0; // reset the denominator before next particle...
-      if(j != l) {
-	_img = _image(_r[i][j],_r[i][l]); 
-      
-	for(int b = 0; b < 3; ++b) {
-	  de_ +=  ((_img[b] - _r[i][j][b]) *
-		   (_img[b] - _r[i][j][b]));
-	}
-	
-	_Ptot[i] += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
-      }
-    }
-  }
-  
-  
   _Ptot[i] *= 1/(6*_nparticles*_Ttot[i]);
-  _Ptot[i] = 1 - _Ptot[i];
+  _Ptot[i]  = 1 - _Ptot[i];
 }
   
 std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
@@ -299,5 +280,4 @@ void LArgon::_scale_velocities(const int& i, const double& T){
   for(auto j : boost::irange(0,_nparticles))
     for(int b = 0; b < 3; ++b)
       _v[i][j][b] *= scale_;
-  
 }
