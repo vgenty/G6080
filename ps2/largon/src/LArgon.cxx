@@ -7,11 +7,11 @@ void LArgon::evolve(const bool r) {
   for(auto i : boost::irange(0,_nsteps-1)) {
     
     
-    if(!(i%20) && i < floor(0.8*_nsteps)){
+    if(!(i%5) && i < floor(0.85*_nsteps)){
       std::cout << "Step: " << i << std::endl;
       std::cout << "Temp: " << _Ttot[i] << "\n";
-      //std::cout << "Pres: " << _Ptot[i] << "\n";
-      //_scale_velocities(i,_Tfinal);
+      std::cout << "Pres: " << _Ptot[i] << "\n";
+      //_scale_velocities(i,0.001);
     } 
     
     //slowly lower the temperature of the system.
@@ -29,6 +29,7 @@ void LArgon::evolve(const bool r) {
       }
     }
     
+
     _F(i+1);
     
     //std::cout << std::setprecision(15) << "r[" << i << "][" << 0 << "] = {" << _r[i][50][0] << ","
@@ -40,6 +41,7 @@ void LArgon::evolve(const bool r) {
     
     _T(i+1);
     _K(i+1);
+    _P(i+1);
   
   }
   std::cout << "Simulation finished calculating final pressure value" << std::endl;
@@ -47,12 +49,11 @@ void LArgon::evolve(const bool r) {
   int f_ = _nsteps-1;
   std::array<double , 3> img_;
   double de_ = 0.0;
-  double fe_ = 0.0;
+
   //Sim is done lets print to the screen the pressure...
   for(auto j : boost::irange(0,_nparticles)){
     for(auto l : boost::irange(0,_nparticles)){
       de_ = 0.0;
-      fe_ = 0.0;
       if(j != l) {
 	img_ = _image(_r[f_][j],_r[f_][l]);
 	for(int b = 0; b < 3; ++b) {
@@ -63,7 +64,7 @@ void LArgon::evolve(const bool r) {
 	//   fe_ += (_r[f_][j][b] - img_[b])*(_r[f_][j][b] - img_[b]);
 	
 	//p_ += sqrt(de_) * sqrt(fe_) * fabs(48*(pow(de_,-7) - 0.5*pow(de_,-4))); 
-	p_ += fabs(48*(pow(de_,-6) - 0.5*pow(de_,-3))); 
+	p_ -= 48*(pow(de_,-6) - 0.5*pow(de_,-3)); 
 	//p_ += fabs(_m*(pow(de_,-6) - 0.5*pow(de_,-3))); 
 	
       }
@@ -107,7 +108,6 @@ void LArgon::_restart() {
   
   //Scale all velocities to initial temperature
   _scale_velocities(0,_Tinit);
-  
   
   // Figure out how we will partition all the particles
   // we can put a cube root of the number of particles in each direction
@@ -164,6 +164,7 @@ void LArgon::_restart() {
   _T(0);
   _K(0);
   _F(0);
+  _P(0);
 
 }
 
@@ -195,17 +196,41 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
 		 (_img[l][b] - _r[i][j][b]));
       }
       
-      if(k == 0){ //update the potential only when x coordinate is seen, same with pressure
-	_PEtot[i] += 4*(0.5)*(pow(de_,-6) - pow(de_,-3)) ;
+      if(k == 0){ //update the potential only when x coordinate is seen
+	_PEtot[i]  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3)) ;
       }
       ff_ += 48 * (_r[i][j][k] - _img[l][k])*(pow(de_,-7) - 0.5*pow(de_,-4));
       // if(j == 0)
       // 	std::cout << k << " ~ dir ~ " << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << _img[l][0] << "," << _img[l][1] << "," << _img[l][2] << "} \ntotal f is: " << std::setprecision(15) << ff_ << "\n~~\n";
     }
   }
-  
+
   return ff_;
   
+}
+void LArgon::_P(const int& i) { // Force will now to _P
+  double de_;
+  
+  std::array<double,3> _img;  
+  for(auto j : boost::irange(0,_nparticles)) { // for each particle
+    for(auto l : boost::irange(0,_nparticles)) { // for each particle
+      de_ = 0.0; // reset the denominator before next particle...
+      if(j != l) {
+	_img = _image(_r[i][j],_r[i][l]); 
+      
+	for(int b = 0; b < 3; ++b) {
+	  de_ +=  ((_img[b] - _r[i][j][b]) *
+		   (_img[b] - _r[i][j][b]));
+	}
+	
+	_Ptot[i] += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
+      }
+    }
+  }
+  
+  
+  _Ptot[i] *= 1/(6*_nparticles*_Ttot[i]);
+  _Ptot[i] = 1 - _Ptot[i];
 }
   
 std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,

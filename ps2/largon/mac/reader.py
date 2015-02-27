@@ -66,8 +66,11 @@ def main():
     c7.cd()
     vv[1].Draw("COLZ")
     
-
-    raw_input('')
+    c8 = TCanvas()
+    c8.cd()
+    p = P(b)
+    p.Draw("AL")
+    
     raw_input('')
     
 def initialR(b):
@@ -127,19 +130,40 @@ def E(b):
     
     tg1 = TGraph() 
     tg2 = TGraph()
+    tg3 = TGraph()
     tm  = TMultiGraph()
 
     tm.Add(tg1,"L")
     tm.Add(tg2,"L")
+    tm.Add(tg3,"L")
 
     #print len(b.KE())
     
     for i in xrange(len(b.KE())) :
         tg1.SetPoint(i,i,b.KE()[i])
         tg2.SetPoint(i,i,b.PE()[i])
-       #print "TOTAL E = %f, energy now = %f, diff = %f" % (b.PE()[0]+b.KE()[0], b.PE()[i]+b.KE()[i], (b.PE()[0]+b.KE()[0]) - (b.PE()[i]+b.KE()[i]))
+        tg3.SetPoint(i,i,b.PE()[i]+b.KE()[i])
+        #print "TOTAL E = %f, energy now = %f, diff = %f" % (b.PE()[0]+b.KE()[0], b.PE()[i]+b.KE()[i], (b.PE()[0]+b.KE()[0]) - (b.PE()[i]+b.KE()[i]))
     
     return tm
+
+def P(b):
+    
+    tg1 = TGraph() 
+    #tg2 = TGraph()
+    #tm  = TMultiGraph()
+
+    #tm.Add(tg1,"L")
+    #tm.Add(tg2,"L")
+
+    #print len(b.KE())
+    
+    for i in xrange(len(b.P())) :
+        tg1.SetPoint(i,i,b.P()[i])
+        #tg2.SetPoint(i,i,b.PE()[i])
+       #print "TOTAL E = %f, energy now = %f, diff = %f" % (b.PE()[0]+b.KE()[0], b.PE()[i]+b.KE()[i], (b.PE()[0]+b.KE()[0]) - (b.PE()[i]+b.KE()[i]))
+    
+    return tg1
 
 def TT(b):
     tgT = TGraph()
