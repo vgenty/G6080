@@ -3,7 +3,8 @@ project(largon)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
-set(CMAKE_CXX_FLAGS "-O3 -std=c++1y -Wall")
+#set(CMAKE_CXX_FLAGS "-O3 -std=c++1y -Wall")
+set(CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall -v")
 set(CMAKE_SHARED_LINKER_FLAGS "")
 set(CMAKE_EXE_LINKER_FLAGS "")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
@@ -47,3 +48,4 @@ add_library(
   )
 
 target_link_libraries(LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
+#add_executable(develop develop.cxx)
