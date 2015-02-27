@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #ROOT includes
-from ROOT import TGraph, TMultiGraph, TCanvas, TLatex, TLegend, TH1D, TGraph2D
+from ROOT import TGraph, TMultiGraph, TCanvas, TLatex, TLegend, TH1D, TGraph2D, TH2D, gStyle
 #User includes
 from looks import *
 #Python includes
@@ -21,24 +21,24 @@ def main():
     b = intree.LArgon
     
     looks_minos()
-
+    
     rr = initialR(b)
-    vv = initialV(b,-3,3)
+    vv = initialV(b,-5,5)
     tt = TT(b)
 
     c1 = TCanvas()
     c1.cd()    
     #rr[0][0].Draw()
-    vv[0].Draw()
+    vv[0][0].Draw()
     
     c2 = TCanvas()
     c2.cd()    
     #rr[0][1].Draw()
-    vv[1].Draw()
+    vv[0][1].Draw()
 
     c3 = TCanvas()
     c3.cd()    
-    vv[2].Draw()
+    vv[0][2].Draw()
     
 
     
@@ -60,6 +60,14 @@ def main():
     c6.cd()
     tt.Draw("AL")
 
+    gStyle.SetPalette(55)
+
+    c7 = TCanvas()
+    c7.cd()
+    vv[1].Draw("COLZ")
+    
+
+    raw_input('')
     raw_input('')
     
 def initialR(b):
@@ -93,8 +101,8 @@ def initialR(b):
     return [tR,tg2d]
 
 def initialV(b,vmin, vmax):
-    # Ghetto way of looking at the R[0] and V[0]
 
+    tV2D = TH2D("2d","",150,0,150,100,vmin,vmax)
 
     tV = [TH1D("Vx",";Vx;",100,vmin,vmax),
           TH1D("Vy",";Vy;",100,vmin,vmax),
@@ -102,6 +110,9 @@ def initialV(b,vmin, vmax):
 
     c = 0
     for i in b.V():
+        for j in i:
+            tV2D.Fill(c,j[0])
+
         if(c == 99):
             for j in i:
                 tV[0].Fill(j[0])
@@ -110,7 +121,7 @@ def initialV(b,vmin, vmax):
         c +=1
   
         
-    return tV
+    return [tV,tV2D]
 
 def E(b):
     

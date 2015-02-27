@@ -24,6 +24,8 @@ private:
   double _L;
   double _t;
   double _Tinit;
+  double _Tfinal;
+  double _Tfinal_scale;
 
   // int step, int particle number, double 3 vector
 
@@ -35,11 +37,12 @@ private:
 
   // force
   std::vector<std::vector<std::array<double, 3> > > _f;
-
+  
   // Energy
   std::vector<double> _KEtot;
   std::vector<double> _PEtot;
   std::vector<double> _Ttot;
+  std::vector<double> _Ptot;
 
   void _restart();
   void _from_file();
@@ -65,11 +68,14 @@ private:
   double _get_ran_double(double min, double max);
   boost::mt19937 _rng;
 
+  void _scale_velocities(const int& i, const double& T);
+  
 public:
   
   LArgon() {} //Default constructor for ROOT
 
-  LArgon(int ns, int np, double p, double T) : _m(_epsilon/(_sigma*_sigma))
+  LArgon(int ns, int np, double p, double Ti, double Tf) : 
+    _m(48.0*_epsilon/(_sigma*_sigma))
   {
     _nparticles = np;
     _nsteps     = ns;
@@ -77,7 +83,8 @@ public:
     _L = std::cbrt(np/p);
     //_t = 0.032; // from Verlet paper
     _t = 0.01; // from Bob
-    _Tinit = T;
+    _Tinit = Ti;
+    _Tfinal = Tf;
     // Prellocate vectors for speed
     _r.resize(ns);
     _v.resize(ns);
@@ -85,6 +92,7 @@ public:
     
     _KEtot.resize(ns);
     _PEtot.resize(ns);
+    _Ptot.resize(ns);
     _Ttot.resize(ns);
 
     //Resize all vectors in the step
@@ -95,6 +103,7 @@ public:
     }
   
     _img.resize(np);
+    _rng.seed(static_cast<unsigned int>(std::time(0))); // set seed
 
   }
   

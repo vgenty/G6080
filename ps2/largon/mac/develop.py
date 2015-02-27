@@ -9,7 +9,8 @@ ROOT.gSystem.Load('../lib/libLArgon')
 # Call largon constructor, if you change second two values 
 # immediately go to _restart() function
 
-b = ROOT.LArgon(int(150),int(1000),float(0.75),float(1.069))
+# constructor is nsteps, nparticles, density, initial temp, desired final temp
+b = ROOT.LArgon(int(100),int(27),float(0.906318),float(1.0),float(1.069))
 
 outfile = ROOT.TFile('out.root','recreate')
 outtree = ROOT.TTree('outtree','physics')
@@ -21,5 +22,3 @@ b.evolve(1)
 outtree.Fill()
 outtree.Write()
 outfile.Close()
-
-
