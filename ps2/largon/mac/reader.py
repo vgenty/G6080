@@ -13,7 +13,7 @@ from ROOT import LArgon
 
 
 def main():
-    infile = ROOT.TFile('out.root','read')
+    infile = ROOT.TFile('../output/out.root','read')
     intree = infile.Get('outtree')
     
     intree.GetEntry(0) #only one entry get first entry
@@ -70,7 +70,9 @@ def main():
     c8.cd()
     p = P(b)
     p.Draw("AL")
-    
+    c8.Update()
+    c8.Modified()
+
     raw_input('')
     
 def initialR(b):

@@ -9,6 +9,8 @@
 #include "boost/range/irange.hpp"
 #include "boost/random.hpp"
 
+#include "TFile.h"
+
 class LArgon { 
 
 private:
@@ -17,47 +19,48 @@ private:
   const double _epsilon = 119.8; // Kelvin
   const double _sigma   = 3.405; // Angstroms
   double _m;
-  int _nparticles;
   
   //Simulation Constants
+  int _nparticles;
   int _nsteps;
   double _L;
   double _t;
   double _Tinit;
   double _Tfinal;
-  double _Tfinal_scale;
+  int _start;
 
   // int step, int particle number, double 3 vector
-
+  
   // positions
   std::vector<std::vector<std::array<double, 3> > > _r;
-
+  
   // velocity
   std::vector<std::vector<std::array<double, 3> > > _v;
-
+  
   // force
   std::vector<std::vector<std::array<double, 3> > > _f;
-  
-  // Energy
+
+  // energy
   std::vector<double> _KEtot;
   std::vector<double> _PEtot;
   std::vector<double> _Ttot;
   std::vector<double> _Ptot;
 
+  //Simulation directors
+  void _routine();
   void _restart();
   void _from_file();
-
+  
   double _force(const int&i,const int& j, const int& k);
-  //double _pe(const int&i,const int& j);
   
   void _F(const int& i);
   void _K(const int& i);
   void _T(const int& i);
-  void _P(const int& i); // Force will now to _P
+  void _P(const int& i); // Force will now do Virial
   
   std::array<double, 3> _image(const std::array<double,3>& first,
 			       const std::array<double,3>& second);
-
+  
    //image location placeholder...
   std::vector<std::array<double, 3> > _img;
 
@@ -70,6 +73,7 @@ private:
 
   void _scale_velocities(const int& i, const double& T);
   
+
 public:
   
   LArgon() {} //Default constructor for ROOT
@@ -85,6 +89,7 @@ public:
     _t = 0.01; // from Bob
     _Tinit = Ti;
     _Tfinal = Tf;
+
     // Prellocate vectors for speed
     _r.resize(ns);
     _v.resize(ns);
@@ -111,12 +116,12 @@ public:
   
   // Public evolve
   void evolve(const bool r);
-
+  
   //Getters
   std::vector<double> KE() const; // KE
   std::vector<double> PE() const; // PE
   std::vector<double> T() const; // T
-  std::vector<double> P() const; // P
+  std::vector<double> P() const; // P (Virial...)
 
   std::vector<std::vector<std::array<double, 3> > > R() const;
   std::vector<std::vector<std::array<double, 3> > > V() const;
@@ -129,7 +134,5 @@ inline std::vector<double> LArgon::P() const  { return _Ptot; }
 
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::R() const { return _r; }
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::V() const { return _v; }
-
-
 
 #endif

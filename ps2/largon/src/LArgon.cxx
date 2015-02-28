@@ -1,18 +1,30 @@
 #include "LArgon.h"
 
 void LArgon::evolve(const bool r) {
-  r ? _restart() : _from_file();
   
+  !r ? _restart() : _from_file();
   
-  for(auto i : boost::irange(0,_nsteps-1)) {
-    
-    
-    if(!(i%5) && i < floor(0.85*_nsteps)){
+  _routine();
+  
+}
+
+void LArgon::_routine() {
+
+  for(auto i : boost::irange(_start,_nsteps-1)) {
+
+    if(!(i%500)){
       std::cout << "Step: " << i << std::endl;
       std::cout << "Temp: " << _Ttot[i] << "\n";
       std::cout << "Pres: " << _Ptot[i] << "\n";
-      //_scale_velocities(i,0.001);
+      _scale_velocities(i,0.0000001);
     } 
+
+    
+    // if( i == floor(0.5*_nsteps))
+    //   for(auto j : boost::irange(0,_nparticles))
+    // 	for(int k = 0; k < 3; ++k)
+    // 	  _v[i][j][k] *= -1.0;
+      
     
     //slowly lower the temperature of the system.
     
@@ -31,10 +43,7 @@ void LArgon::evolve(const bool r) {
     
 
     _F(i+1);
-    
-    //std::cout << std::setprecision(15) << "r[" << i << "][" << 0 << "] = {" << _r[i][50][0] << ","
-    // 	      << _r[i][50][1] << "," << _r[i][50][2] << "}\n";  
-    
+
     for(auto j : boost::irange(0,_nparticles))
       for(int k = 0; k < 3; ++k)
 	_v[i+1][j][k] = _v[i][j][k] + 0.5*(_f[i][j][k] + _f[i+1][j][k])*_t;
@@ -44,41 +53,15 @@ void LArgon::evolve(const bool r) {
     _P(i+1);
   
   }
-  std::cout << "Simulation finished calculating final pressure value" << std::endl;
-  double p_ = 0.0;
-  int f_ = _nsteps-1;
-  std::array<double , 3> img_;
-  double de_ = 0.0;
-
-  //Sim is done lets print to the screen the pressure...
-  for(auto j : boost::irange(0,_nparticles)){
-    for(auto l : boost::irange(0,_nparticles)){
-      de_ = 0.0;
-      if(j != l) {
-	img_ = _image(_r[f_][j],_r[f_][l]);
-	for(int b = 0; b < 3; ++b) {
-	  de_ +=  ((img_[b] - _r[f_][j][b]) *
-		   (img_[b] - _r[f_][j][b]));
-	}
-	// for(int b = 0; b<3; ++b)
-	//   fe_ += (_r[f_][j][b] - img_[b])*(_r[f_][j][b] - img_[b]);
-	
-	//p_ += sqrt(de_) * sqrt(fe_) * fabs(48*(pow(de_,-7) - 0.5*pow(de_,-4))); 
-	p_ -= 48*(pow(de_,-6) - 0.5*pow(de_,-3)); 
-	//p_ += fabs(_m*(pow(de_,-6) - 0.5*pow(de_,-3))); 
-	
-      }
-    }
-  }
-  
-  //p_ *= (1/(6*_nparticles*_Ttot[f_]));
-  p_ *= (1/(6*_nparticles*_Ttot[f_]));
-  p_ = 1 - p_;
-  std::cout << "p_: " << p_ << std::endl;
+  std::cout << "Finished\n";
 }
+
+
 
 void LArgon::_restart() {
   
+  _start = 0;
+
   // Set initial velocity to zero
   std::array<double,3> totV_ = {0.0,0.0,0.0};
 
@@ -111,16 +94,17 @@ void LArgon::_restart() {
   
   // Figure out how we will partition all the particles
   // we can put a cube root of the number of particles in each direction
-  
-  // TODO: tweak nside_ definition it's scary, lets get it working for _p = 1.0
+ 
+  // TODO: tweak nside_ definition it's scary, lets get it working for a few _p
   int nside_ = floor(std::cbrt(_nparticles)); 
   double inc_   = _L/nside_;
   int    cnt_   = 0;
   double extra_ = _nparticles - pow(nside_,3.0);
   
-  std::cout << "extra_: " << extra_ << std::endl;
-  std::cout << "pre density: " << pow(nside_/_L,3.0) << std::endl;
-  std::cout << " nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
+  std::cout << "Extra_: " << extra_ << std::endl;
+  std::cout << "Pre density: " << pow(nside_/_L,3.0) << std::endl;
+  std::cout << "nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
+
   for(auto x : boost::irange(0,nside_)) { // x direction
     for(auto y : boost::irange(0,nside_)) { // y direction
       for(auto z : boost::irange(0,nside_)) { // z direction
@@ -152,10 +136,10 @@ void LArgon::_restart() {
   }
   
  LABEL:
-  std::cout << "post density: " << cnt_/pow(_L,3.0) << std::endl;
+  std::cout << "Post density: " << cnt_/pow(_L,3.0) << std::endl;
   
   if(_nparticles != cnt_){
-    std::cout << "couldn't get the required density :- (" << std::endl;
+    std::cout << "Couldn't get the required density :- (" << std::endl;
     std::exit(0);
   }
   std::cout << "I put: " << cnt_ << " particles in the box" << std::endl;
@@ -169,8 +153,10 @@ void LArgon::_restart() {
 }
 
 void LArgon::_from_file() {
-  std::cout << "Reading in data from the ROOT file and beginning simulation.";
-  
+  std::cout << "Reading in data from the ROOT file and beginning simulation.\n";
+    
+  //Set _start num steps
+  std::cout << "PEtot: " << _PEtot[50] << std::endl;
 }
 
 void LArgon::_F(const int& i) {
