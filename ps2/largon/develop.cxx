@@ -5,13 +5,18 @@
 
 #include "boost/program_options.hpp"
 
+#include <vector>
+#include <iostream>
+
 int main(int argc, char *argv[]) {
 
   namespace po = boost::program_options;
   po::options_description desc("\nrestart,\ncontinue");
   desc.add_options()
-    ("restart,r","Restart (destroy out.root)")
-    ("continue,c","Continue from out.root");
+    ("restart,r",po::value<std::vector<double> >()->multitoken(),
+     "-r [steps] [particles] [density] [Ti] [Tf] ~ Restart (destroy out.root)")
+    ("continue,c",po::value<int>(),
+     "-c [more events] Continue from out.root");
   
   po::variables_map vm;
   po::store(po::parse_command_line(argc,argv,desc),vm);
@@ -22,11 +27,15 @@ int main(int argc, char *argv[]) {
     auto the_file = std::make_shared<TFile>("output/out.root","RECREATE");
     auto the_tree = std::make_shared<TTree>("outtree","physics");
     
-    LArgon b(10000,300,0.75,0.1,1.069);
+    LArgon b(vm["restart"].as<std::vector<double> >()[0],
+	     vm["restart"].as<std::vector<double> >()[1],
+	     vm["restart"].as<std::vector<double> >()[2],
+	     vm["restart"].as<std::vector<double> >()[3],
+	     vm["restart"].as<std::vector<double> >()[4]);
     
     the_tree->Branch("LArgon",&b);
     
-    b.evolve(0);
+    b.evolve();
     
     the_tree->Fill();
     the_tree->Write();
@@ -38,15 +47,24 @@ int main(int argc, char *argv[]) {
     
     LArgon *b = new LArgon();
     
-    auto the_file = std::make_shared<TFile>("output/out.root","read");
-    auto in_tree  = dynamic_cast<TTree*>(the_file->Get("outtree"));
+    auto in_file = std::make_shared<TFile>("output/out.root","READ");
+    auto in_tree  = dynamic_cast<TTree*>(in_file->Get("outtree"));
+
     in_tree->SetBranchAddress("LArgon",&b);
     in_tree->GetEntry(0); // There should be only one entry
     
-  
-    //a.evolve(b);
-    b->evolve(1);
+    b->evolve(vm["continue"].as<int>());
+
+    auto out_file = std::make_shared<TFile>("output/out.root","RECREATE");
+    auto out_tree = std::make_shared<TTree>("outtree","physics");
     
+    out_tree->Branch("LArgon",&b);
+    
+    out_tree->Fill();
+    out_tree->Write();
+    out_file->Close();
+    
+
   }
 
   

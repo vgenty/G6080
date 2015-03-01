@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 
 #ROOT includes
 from ROOT import TGraph, TMultiGraph, TCanvas, TLatex, TLegend, TH1D, TGraph2D, TH2D, gStyle

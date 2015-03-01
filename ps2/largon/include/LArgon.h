@@ -13,7 +13,7 @@
 
 class LArgon { 
 
-private:
+ private:
   
   //LAr Constants
   const double _epsilon = 119.8; // Kelvin
@@ -49,7 +49,7 @@ private:
   //Simulation directors
   void _routine();
   void _restart();
-  void _from_file();
+  void _from_file(int more_steps);
   
   double _force(const int&i,const int& j, const int& k);
   
@@ -61,7 +61,7 @@ private:
   std::array<double, 3> _image(const std::array<double,3>& first,
 			       const std::array<double,3>& second);
   
-   //image location placeholder...
+  //image location placeholder...
   std::vector<std::array<double, 3> > _img;
 
   //Random number object - use boost even though it's in C++11
@@ -70,52 +70,39 @@ private:
   
   double _get_ran_double(double min, double max);
   boost::mt19937 _rng;
-
+  
   void _scale_velocities(const int& i, const double& T);
   
-
-public:
+  
+  void _resize_all(const int& ns,const int& np); //For new run/continue
+  
+ public:
   
   LArgon() {} //Default constructor for ROOT
-
-  LArgon(int ns, int np, double p, double Ti, double Tf) : 
-    _m(48.0*_epsilon/(_sigma*_sigma))
-  {
-    _nparticles = np;
-    _nsteps     = ns;
-    
-    _L = std::cbrt(np/p);
-    //_t = 0.032; // from Verlet paper
-    _t = 0.01; // from Bob
-    _Tinit = Ti;
-    _Tfinal = Tf;
-
-    // Prellocate vectors for speed
-    _r.resize(ns);
-    _v.resize(ns);
-    _f.resize(ns);  
-    
-    _KEtot.resize(ns);
-    _PEtot.resize(ns);
-    _Ptot.resize(ns);
-    _Ttot.resize(ns);
-
-    //Resize all vectors in the step
-    for(auto k : boost::irange(0,ns)) {
-      _r[k].resize(np);
-      _v[k].resize(np);
-      _f[k].resize(np);
-    }
   
-    _img.resize(np);
-    _rng.seed(static_cast<unsigned int>(std::time(0))); // set seed
-
-  }
+ LArgon(int ns, int np, double p, double Ti, double Tf) : 
+  _m(48.0*_epsilon/(_sigma*_sigma))
+    {
+      _nparticles = np;
+      _nsteps     = ns;
+      
+      _L = std::cbrt(np/p);
+      //_t = 0.032; // from Verlet paper
+      _t = 0.01; // from Bob
+      _Tinit = Ti;
+      _Tfinal = Tf;
+      
+      _resize_all(ns,np);
+      
+      _rng.seed(static_cast<unsigned int>(std::time(0))); // set seed
+      
+    }
   
   virtual ~LArgon() {}
   
   // Public evolve
-  void evolve(const bool r);
+  void evolve();
+  void evolve(int i);
   
   //Getters
   std::vector<double> KE() const; // KE

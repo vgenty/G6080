@@ -1,15 +1,17 @@
 #include "LArgon.h"
-
-void LArgon::evolve(const bool r) {
-  
-  !r ? _restart() : _from_file();
-  
+void LArgon::evolve() {
+  _restart();
   _routine();
-  
+}
+
+void LArgon::evolve(int i) {
+  _from_file(i);
+  _routine();
 }
 
 void LArgon::_routine() {
-
+  
+  std::cout <<  "\n" << _start << "\n";
   for(auto i : boost::irange(_start,_nsteps-1)) {
 
     if(!(i%500)){
@@ -61,7 +63,7 @@ void LArgon::_routine() {
 void LArgon::_restart() {
   
   _start = 0;
-
+  std::cout << std::endl << _start << "\n\n\n\n\n";
   // Set initial velocity to zero
   std::array<double,3> totV_ = {0.0,0.0,0.0};
 
@@ -152,11 +154,14 @@ void LArgon::_restart() {
 
 }
 
-void LArgon::_from_file() {
+void LArgon::_from_file(int more_steps) {
   std::cout << "Reading in data from the ROOT file and beginning simulation.\n";
-    
-  //Set _start num steps
-  std::cout << "PEtot: " << _PEtot[50] << std::endl;
+
+  _start   = _nsteps;
+  _nsteps += more_steps;
+
+  _resize_all(_nsteps,_nparticles);
+  
 }
 
 void LArgon::_F(const int& i) {
@@ -196,8 +201,11 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
   
 }
 void LArgon::_P(const int& i) { // Force will now to _P
-  _Ptot[i] *= 1/(6*_nparticles*_Ttot[i]);
-  _Ptot[i]  = 1 - _Ptot[i];
+
+  //For now let _P calculate just the virial 
+  
+  //_Ptot[i] *= 1/(6*_nparticles*_Ttot[i]);
+  //_Ptot[i]  = 1 - _Ptot[i];
 }
   
 std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
@@ -266,4 +274,27 @@ void LArgon::_scale_velocities(const int& i, const double& T){
   for(auto j : boost::irange(0,_nparticles))
     for(int b = 0; b < 3; ++b)
       _v[i][j][b] *= scale_;
+}
+
+void LArgon::_resize_all(const int& ns, const int& np) {
+
+  // Prellocate vectors for speed
+  _r.resize(ns);
+  _v.resize(ns);
+  _f.resize(ns);  
+  
+  _KEtot.resize(ns);
+  _PEtot.resize(ns);
+  _Ptot.resize(ns);
+  _Ttot.resize(ns);
+
+  //Resize all vectors in the step
+  for(auto k : boost::irange(0,ns)) {
+    _r[k].resize(np);
+    _v[k].resize(np);
+    _f[k].resize(np);
+  }
+
+  _img.resize(np);
+
 }
