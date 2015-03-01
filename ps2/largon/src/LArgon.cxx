@@ -1,3 +1,5 @@
+//vgenty@nevis.columbia.edu
+
 #include "LArgon.h"
 void LArgon::evolve() {
   _restart();
@@ -11,14 +13,13 @@ void LArgon::evolve(int i) {
 
 void LArgon::_routine() {
   
-  std::cout <<  "\n" << _start << "\n";
   for(auto i : boost::irange(_start,_nsteps-1)) {
 
-    if(!(i%500)){
+    if(!(i%10)){
       std::cout << "Step: " << i << std::endl;
       std::cout << "Temp: " << _Ttot[i] << "\n";
-      std::cout << "Pres: " << _Ptot[i] << "\n";
-      _scale_velocities(i,0.0000001);
+      std::cout << "Vir : " << _Ptot[i] << "\n";
+      //_scale_velocities(i,0.0000001);
     } 
 
     
@@ -56,6 +57,7 @@ void LArgon::_routine() {
   
   }
   std::cout << "Finished\n";
+  std::exit(0);
 }
 
 
@@ -63,8 +65,7 @@ void LArgon::_routine() {
 void LArgon::_restart() {
   
   _start = 0;
-  std::cout << std::endl << _start << "\n\n\n\n\n";
-  // Set initial velocity to zero
+    // Set initial velocity to zero
   std::array<double,3> totV_ = {0.0,0.0,0.0};
 
   //Some range of initial velocities
@@ -103,7 +104,7 @@ void LArgon::_restart() {
   int    cnt_   = 0;
   double extra_ = _nparticles - pow(nside_,3.0);
   
-  std::cout << "Extra_: " << extra_ << std::endl;
+  std::cout << "Extra_: " << extra_ << " particles not in cubic" << std::endl;
   std::cout << "Pre density: " << pow(nside_/_L,3.0) << std::endl;
   std::cout << "nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
 
@@ -138,14 +139,14 @@ void LArgon::_restart() {
   }
   
  LABEL:
-  std::cout << "Post density: " << cnt_/pow(_L,3.0) << std::endl;
+  std::cout << "Post density: " << cnt_/pow(_L,3.0) << " on face centered cubic" << std::endl;
   
   if(_nparticles != cnt_){
-    std::cout << "Couldn't get the required density :- (" << std::endl;
+    std::cout << "Couldn't get the required density :- ( on partial FCC" << std::endl;
     std::exit(0);
   }
-  std::cout << "I put: " << cnt_ << " particles in the box" << std::endl;
-  std::cout << "Initializing force\n" << std::endl;
+  std::cout << "I put: " << cnt_ << " particles in the box just fine" << std::endl;
+  std::cout << "Initializing T,K,F,P\n" << std::endl;
   
   _T(0);
   _K(0);
@@ -157,7 +158,7 @@ void LArgon::_restart() {
 void LArgon::_from_file(int more_steps) {
   std::cout << "Reading in data from the ROOT file and beginning simulation.\n";
 
-  _start   = _nsteps;
+  _start   = _nsteps-1;
   _nsteps += more_steps;
 
   _resize_all(_nsteps,_nparticles);

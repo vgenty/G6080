@@ -50,3 +50,6 @@ add_library(
 add_executable(develop develop.cxx ${ROOT_LIBRARIES})
 target_link_libraries(develop LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
 
+if(ROOT6)
+  install(FILES ${CMAKE_BINARY_DIR}/LArgonDict_rdict.pcm DESTINATION "${CMAKE_SOURCE_DIR}/lib")
+endif()

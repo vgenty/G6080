@@ -1,3 +1,5 @@
+//vgenty@nevis.columbia.edu
+
 #include "LArgon.h"
 
 #include "TFile.h"
@@ -11,8 +13,9 @@
 int main(int argc, char *argv[]) {
 
   namespace po = boost::program_options;
-  po::options_description desc("\nrestart,\ncontinue");
+  po::options_description desc("\nLiquid Argon Simulation\nvgenty@nevis.columbia.edu\n\n\nOptions");
   desc.add_options()
+    ("help,h","Print help message")
     ("restart,r",po::value<std::vector<double> >()->multitoken(),
      "-r [steps] [particles] [density] [Ti] [Tf] ~ Restart (destroy out.root)")
     ("continue,c",po::value<int>(),
@@ -22,7 +25,11 @@ int main(int argc, char *argv[]) {
   po::store(po::parse_command_line(argc,argv,desc),vm);
   po::notify(vm);
   
-  if ( vm.count("restart") ) {
+  if ( vm.count("help") ) {
+    std::cout << desc << std::endl;
+    return 0;
+  }
+  else if ( vm.count("restart") ) {
     
     auto the_file = std::make_shared<TFile>("output/out.root","RECREATE");
     auto the_tree = std::make_shared<TTree>("outtree","physics");
@@ -43,7 +50,7 @@ int main(int argc, char *argv[]) {
   
   }
   
-  if (vm.count("continue")) {
+  else if (vm.count("continue")) {
     
     LArgon *b = new LArgon();
     
