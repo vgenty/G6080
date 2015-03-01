@@ -21,9 +21,14 @@ def main():
     intree.GetEntry(0) #only one entry get first entry
     b = intree.LArgon    
     looks_minos()
-
-    args = sys.argv
     
+    
+    args = sys.argv
+    args.pop(0)
+    print "\n\n\n\n"
+    if(len(args) == 0):
+        print "./reader.py energy/position/velocity"
+        sys.exit()
     
     if(args[0] == "energy"):
         c1 = [TCanvas() for x in xrange(4)]
@@ -39,7 +44,7 @@ def main():
         e[0].GetXaxis().CenterTitle()
         e[0].GetYaxis().SetTitle("Kinetic Energy")
         e[0].GetYaxis().CenterTitle()
-        e[0].Draw()
+        e[0].Draw("AL")
         
         #Potential
         c1[1].cd()
@@ -48,16 +53,16 @@ def main():
         e[1].GetXaxis().CenterTitle()
         e[1].GetYaxis().SetTitle("Potential Energy")
         e[1].GetYaxis().CenterTitle()
-        e[1].Draw()
+        e[1].Draw("AL")
 
         #Total
         c1[2].cd()
-        e[2].SetLineColor(3)
-        e[2].GetXaxis().SetTitle("Time")
-        e[2].GetXaxis().CenterTitle()
-        e[2].GetYaxis().SetTitle("Total Energy")
-        e[2].GetYaxis().CenterTitle()
-        e[2].Draw()
+        e[4].SetLineColor(3)
+        e[4].GetXaxis().SetTitle("Time")
+        e[4].GetXaxis().CenterTitle()
+        e[4].GetYaxis().SetTitle("1-Etot/Einit")
+        e[4].GetYaxis().CenterTitle()
+        e[4].Draw("AL")
         
         #Legend
         tll = TLegend(0.5,0.3,0.6,0.8,"Energy","nbNDC")
@@ -83,13 +88,11 @@ def main():
     if(args[0] == "position"):
         c2 = [TCanvas() for x in xrange(4)]
 
-        try:
-            args[1]
-        except NameError:
+        if args[1] is None:
             print "Give me a position step!"
             sys.exit()
 
-        rr = initialR(b,args[1])
+        rr = initialR(b,int(args[1]))
         
         #X
         c2[0].cd()
@@ -124,8 +127,9 @@ def main():
             print "Give me a velocity step!"
             sys.exit()
 
-        vv = initialV(b,-5,5,args[1])
+        vv = initialV(b,-10,10,int(args[1]))
             
+        gStyle.SetPalette(55)
         #X
         c2[0].cd()
         vv[0][0].Draw()
@@ -187,7 +191,7 @@ def initialR(b,d):
         c +=1
         
     
-    tR[0].GetXaxis().SetTitle("X pos @ t = %d" % d)
+    tR[0].GetXaxis().SetTitle("X pos @ t = %d" % d) 
     tR[1].GetXaxis().SetTitle("Y pos @ t = %d" % d)
     tR[2].GetXaxis().SetTitle("Z pos @ t = %d" % d)
 
@@ -196,13 +200,14 @@ def initialR(b,d):
         tR[y].GetYaxis().CenterTitle()
         tR[y].GetXaxis().CenterTitle()
 
-    tg2d.GetXAxis().SetTitle("X")
-    tg2d.GetYAxis().SetTitle("Y")
-    tg2d.GetZAxis().SetTitle("Z")
-
-    tg2d.GetXAxis().CenterTitle()
-    tg2d.GetYAxis().CenterTitle()
-    tg2d.GetZAxis().CenterTitle()
+        
+    tg2d.GetXaxis().SetTitle("X")
+    tg2d.GetYaxis().SetTitle("Y")
+    tg2d.GetZaxis().SetTitle("Z")
+        
+    tg2d.GetXaxis().CenterTitle()
+    tg2d.GetYaxis().CenterTitle()
+    tg2d.GetZaxis().CenterTitle()
 
     return [tR,tg2d]
 
@@ -210,9 +215,9 @@ def initialV(b,vmin, vmax,d):
 
     tV2D = TH2D("2d","",150,0,150,100,vmin,vmax)
 
-    tV = [TH1D("Vx",";Vx;",100,vmin,vmax),
-          TH1D("Vy",";Vy;",100,vmin,vmax),
-          TH1D("Vz",";Vz;",100,vmin,vmax)]
+    tV = [TH1D("Vx","",100,vmin,vmax),
+          TH1D("Vy","",100,vmin,vmax),
+          TH1D("Vz","",100,vmin,vmax)]
 
     c = 0
     for i in b.V():
@@ -232,9 +237,9 @@ def initialV(b,vmin, vmax,d):
     tV[2].GetXaxis().SetTitle("Vz @ t = %d" % d)
 
     for y in xrange(3):
-        tV[i].GetYaxis().SetTitle("Count")
-        tV[i].GetYaxis().CenterTitle()
-        tV[i].GetXaxis().CenterTitle()
+        tV[y].GetYaxis().SetTitle("Count")
+        tV[y].GetYaxis().CenterTitle()
+        tV[y].GetXaxis().CenterTitle()
 
         
     tV2D.GetXaxis().SetTitle("Step")
@@ -249,6 +254,7 @@ def E(b):
     tg1 = TGraph() 
     tg2 = TGraph()
     tg3 = TGraph()
+    tg4 = TGraph()
     tm  = TMultiGraph()
 
     tm.Add(tg1,"L")
@@ -261,12 +267,14 @@ def E(b):
         tg1.SetPoint(i,i,b.KE()[i])
         tg2.SetPoint(i,i,b.PE()[i])
         tg3.SetPoint(i,i,b.PE()[i]+b.KE()[i])
+        tg4.SetPoint(i,i,1-(b.PE()[i] + b.KE()[i])/(b.PE()[0] + b.KE()[0]))
         
     tg1.SetLineWidth(2)
     tg2.SetLineWidth(2)
     tg3.SetLineWidth(2)
+    tg4.SetLineWidth(2)
         
-    return [tg1,tg2,tg3,tm]
+    return [tg1,tg2,tg3,tm,tg4]
 
 def P(b):
     

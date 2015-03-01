@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
     the_tree->Fill();
     the_tree->Write();
     the_file->Close();
+    std::exit(0);
   
   }
   
@@ -70,7 +71,9 @@ int main(int argc, char *argv[]) {
     out_tree->Fill();
     out_tree->Write();
     out_file->Close();
-    
+
+    std::exit(0);
+
 
   }
 

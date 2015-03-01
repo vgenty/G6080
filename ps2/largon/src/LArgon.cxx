@@ -57,7 +57,7 @@ void LArgon::_routine() {
   
   }
   std::cout << "Finished\n";
-  std::exit(0);
+  
 }
 
 
