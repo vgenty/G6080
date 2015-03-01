@@ -154,8 +154,12 @@ def main():
         c2[3].Update()
         c2[3].Modified()
          
-         
-    # tt = TT(b)
+    if(args[0] == "temperature"):
+        
+        c1 = TCanvas();
+        c1.cd()
+        tt = TT(b)
+        tt.Draw("AL")
 
     # c8 = TCanvas()
     # c8.cd()
@@ -300,7 +304,12 @@ def TT(b):
     for i in xrange(len(b.T())):
         tgT.SetPoint(i,i,b.T()[i])
 
-    tgT.SetTitle(";step;T")
+    tgT.GetYaxis().SetTitle("Temperature")
+    tgT.GetXaxis().SetTitle("Time")
+    tgT.GetXaxis().CenterTitle()
+    tgT.GetYaxis().CenterTitle()
+    tgT.SetLineWidth(2)
+    
     return tgT
 
 if __name__ == '__main__' :
