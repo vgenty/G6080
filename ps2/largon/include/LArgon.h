@@ -11,9 +11,10 @@
 #include "boost/range/irange.hpp"
 #include "boost/random.hpp"
 
-#include "TFile.h"
+#include "TObject.h"
 
-class LArgon { 
+class LArgon : public TObject { // I guess we will derive from
+                                // TObject, speeds up ROOT IO 
 
  private:
   
@@ -82,7 +83,7 @@ class LArgon {
   
   LArgon() {} //Default constructor for ROOT
   
- LArgon(int ns, int np, double p, double Ti, double Tf) : 
+  LArgon(int ns, int np, double p, double Ti, double Tf) : 
   _m(48.0*_epsilon/(_sigma*_sigma))
     {
       _nparticles = np;
@@ -109,17 +110,18 @@ class LArgon {
   //Getters
   std::vector<double> KE() const; // KE
   std::vector<double> PE() const; // PE
-  std::vector<double> T() const; // T
-  std::vector<double> P() const; // P (Virial...)
+  std::vector<double> T()  const; // T
+  std::vector<double> P()  const; // P (Virial...)
 
   std::vector<std::vector<std::array<double, 3> > > R() const;
   std::vector<std::vector<std::array<double, 3> > > V() const;
   
+  ClassDef(LArgon,1)
 };
 inline std::vector<double> LArgon::KE() const { return _KEtot; }
 inline std::vector<double> LArgon::PE() const { return _PEtot; }
-inline std::vector<double> LArgon::T() const  { return _Ttot; }
-inline std::vector<double> LArgon::P() const  { return _Ptot; }
+inline std::vector<double> LArgon::T()  const { return _Ttot; }
+inline std::vector<double> LArgon::P()  const { return _Ptot; }
 
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::R() const { return _r; }
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::V() const { return _v; }

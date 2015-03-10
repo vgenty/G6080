@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
     out_tree->Fill();
     out_tree->Write();
     out_file->Close();
+    in_file->Close();
 
     std::exit(0);
 

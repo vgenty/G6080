@@ -15,7 +15,7 @@ void LArgon::_routine() {
   
   for(auto i : boost::irange(_start,_nsteps-1)) {
 
-    if(!(i%10)){
+    if(!(i%1)){
       std::cout << "Step: " << i << std::endl;
       std::cout << "Temp: " << _Ttot[i] << "\n";
       std::cout << "Vir : " << _Ptot[i] << "\n";
@@ -85,11 +85,11 @@ void LArgon::_restart() {
   
   
   //remove CM motion
-  for(auto j : boost::irange(0,_nparticles)) {
-    for(int b = 0; b < 3; ++b) {
+  for(const auto& j : boost::irange(0,_nparticles))
+    for(int b = 0; b < 3; ++b)
       _v[0][j][b] -= totV_[b];
-    }
-  }
+  
+  
   
   
   //Scale all velocities to initial temperature
@@ -99,11 +99,12 @@ void LArgon::_restart() {
   // we can put a cube root of the number of particles in each direction
  
   // TODO: tweak nside_ definition it's scary, lets get it working for a few _p
-  int nside_ = floor(std::cbrt(_nparticles)); 
-  double inc_   = _L/nside_;
-  int    cnt_   = 0;
-  double extra_ = _nparticles - pow(nside_,3.0);
-  
+  auto nside_ = int{static_cast<int>(std::floor(std::cbrt(_nparticles)))}; 
+  auto inc_   = double{_L/nside_};
+  auto cnt_   = int{0};
+  auto extra_ = double{_nparticles - pow(nside_,3.0)};
+
+
   std::cout << "Extra_: " << extra_ << " particles not in cubic" << std::endl;
   std::cout << "Pre density: " << pow(nside_/_L,3.0) << std::endl;
   std::cout << "nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
@@ -168,33 +169,45 @@ void LArgon::_from_file(int more_steps) {
 void LArgon::_F(const int& i) {
   
   //don't change this order will mess up image calculation
-  for(auto j : boost::irange(0,_nparticles)) // for each particle
-    for(int k = 0; k < 3; ++k) // for each direction
+  //for(auto j : boost::irange(0,_nparticles)) // for each particle
+  //#pragma omp parallel
+#pragma omp parallel for collapse(2)
+  for(int j = 0 ; j  < _nparticles; ++j){ // for each particle
+    for(int k = 0; k < 3; ++k) { // for each direction
       _f[i][j][k] = _force(i,j,k);
+    }
+  }
+  
 }
 
 double LArgon::_force(const int& i, const int& j, const int& k) {
   double ff_ = 0.0;
   double de_;
+
+  //delete if not openMP
+  std::array<double, 3> img_ = {0.0,0.0,0.0};
   
   for(auto l : boost::irange(0,_nparticles)) { // for each particle
+  //for(int l = 0 ; l < _nparticles; ++l) { // for each particle
     de_ = 0.0; // reset the denominator before next particle...
     if(j != l) {
       //compute the ``image" distance, feed it the two particles,
-      if(k == 0) { _img[l] = _image(_r[i][j],_r[i][l]); }
-      
+
+      //imcompatable with OPENMP each thread tries to fuck with global var scary
+      //if(k == 0) { _img[l] = _image(_r[i][j],_r[i][l]); }
+      img_ = _image(_r[i][j],_r[i][l]);
+
       for(int b = 0; b < 3; ++b) {
-	de_ +=  ((_img[l][b] - _r[i][j][b]) *
-		 (_img[l][b] - _r[i][j][b]));
+	de_ +=  ((img_[b] - _r[i][j][b]) *
+		 (img_[b] - _r[i][j][b]));
       }
       
       if(k == 0){ //update the potential only when x coordinate is seen
 	_PEtot[i]  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3));
 	_Ptot[i]   += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
       }
-      ff_ += 48 * (_r[i][j][k] - _img[l][k])*(pow(de_,-7) - 0.5*pow(de_,-4));
-      // if(j == 0)
-      // 	std::cout << k << " ~ dir ~ " << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << _img[l][0] << "," << _img[l][1] << "," << _img[l][2] << "} \ntotal f is: " << std::setprecision(15) << ff_ << "\n~~\n";
+      ff_ += 48 * (_r[i][j][k] - img_[k])*(pow(de_,-7) - 0.5*pow(de_,-4));
+
     }
   }
 
@@ -214,12 +227,9 @@ std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
   
   std::array<double, 3> img_ = {0.0,0.0,0.0};
   
-  // std::cout << "have the two particles: (" << one_[0] << "," << one_[1] << "," << one_[2] << ") - (" 
-  // 	    << two_[0] << "," << two_[1] << "," << two_[2] << ")\n";
-  
   //loop over the three directions
   for(auto i: boost::irange(0,3)) {
-    //decide which is shorter, the image or the real
+  //decide which is shorter, the image or the real
     if((fabs(two_[i]-one_[i]) <= fabs(two_[i]-_L-one_[i]))  &&
        (fabs(two_[i]-one_[i]) <= fabs(two_[i]+_L-one_[i]))) {
       img_[i] = two_[i];
@@ -229,7 +239,7 @@ std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
       img_[i] = two_[i]+_L;
     }
   }
-  //  std::cout << "I calculated the image at " << img_[0] << "," << img_[1] << "," << img_[2] << "\n";
+
   return img_;
 }
 
@@ -243,7 +253,7 @@ void LArgon::_K(const int& i) { //for now this is like kinetic energy per mass
 
 void LArgon::_T(const int& i) {
   
-  double squarev_ = 0.0;
+  auto squarev_ = double{0.0};
   for(auto j : boost::irange(0,_nparticles))
     squarev_ += (_v[i][j][0]*_v[i][j][0] +
 		 _v[i][j][1]*_v[i][j][1] +
@@ -290,12 +300,29 @@ void LArgon::_resize_all(const int& ns, const int& np) {
   _Ttot.resize(ns);
 
   //Resize all vectors in the step
+  
   for(auto k : boost::irange(0,ns)) {
+  //  for(int k = 0; k< ns; ++k) {
     _r[k].resize(np);
     _v[k].resize(np);
     _f[k].resize(np);
   }
-
+  
   _img.resize(np);
 
 }
+
+
+//Misc shit:
+
+
+      // if(j == 0)
+      // 	std::cout << k << " ~ dir ~ " << de_ << " ~ dist ~  => p " << j << " {" << _r[i][j][0] << "," << _r[i][j][1] << "," << _r[i][j][2] << "} on p " << l << " {" << _r[i][l][0] << "," << _r[i][l][1] << "," << _r[i][l][2] << "} " << " at image: " << " {" << _img[l][0] << "," << _img[l][1] << "," << _img[l][2] << "} \ntotal f is: " << std::setprecision(15) << ff_ << "\n~~\n";
+
+
+  //  std::cout << "I calculated the image at " << img_[0] << "," << img_[1] << "," << img_[2] << "\n";
+
+
+  // std::cout << "have the two particles: (" << one_[0] << "," << one_[1] << "," << one_[2] << ") - (" 
+  // 	    << two_[0] << "," << two_[1] << "," << two_[2] << ")\n";
+  
