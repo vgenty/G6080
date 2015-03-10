@@ -174,21 +174,26 @@ void LArgon::_F(const int& i) {
 
   double pe_ = 0.0;
   double p_  = 0.0;
-#pragma omp parallel for reduction(+:pe_,p_)
+#pragma omp parallel for collapse(2) reduction(+:pe_,p_)
   for(int j = 0 ; j  < _nparticles; ++j){ // for each particle
-    //    std::cout << "doing particle j: " << j << "\n";
-    //    for(int k = 0; k < 3; ++k) { // for each direction
+    for(int k = 0; k < 3; ++k) { // for each direction
+      auto xxx = _force(i,j,k);
 
-    auto xx = _force(i,j,0);
-    auto yy = _force(i,j,1);
-    auto zz = _force(i,j,2);
+      _f[i][j][k] = std::get<0>(xxx);
+      pe_ += std::get<1>(xxx);
+      p_ += std::get<1>(xxx);
+    }
+    //auto is safe here I think it's really std::tie
+    // auto xx = _force(i,j,0);
+    // auto yy = _force(i,j,1);
+    // auto zz = _force(i,j,2);
 
-    _f[i][j][0] = std::get<0>(xx);
-    _f[i][j][1] = std::get<0>(yy);
-    _f[i][j][2] = std::get<0>(zz);
+    // _f[i][j][0] = std::get<0>(xx);
+    // _f[i][j][1] = std::get<0>(yy);
+    // _f[i][j][2] = std::get<0>(zz);
 
-    pe_ += std::get<1>(xx) + std::get<1>(yy) + std::get<1>(zz);
-    p_  += std::get<2>(xx) + std::get<2>(yy) + std::get<2>(zz);
+    // pe_ += std::get<1>(xx) + std::get<1>(yy) + std::get<1>(zz);
+    // p_  += std::get<2>(xx) + std::get<2>(yy) + std::get<2>(zz);
     
     //}
     
