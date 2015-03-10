@@ -54,7 +54,7 @@ class LArgon : public TObject { // I guess we will derive from
   void _restart();
   void _from_file(int more_steps);
   
-  double _force(const int&i,const int& j, const int& k);
+  std::tuple<double,double,double> _force(const int&i,const int& j, const int& k);
   
   void _F(const int& i);
   void _K(const int& i);

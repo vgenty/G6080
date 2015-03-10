@@ -14,14 +14,14 @@ void LArgon::evolve(int i) {
 void LArgon::_routine() {
   
   for(auto i : boost::irange(_start,_nsteps-1)) {
-
+    
     if(!(i%1)){
       std::cout << "Step: " << i << std::endl;
       std::cout << "Temp: " << _Ttot[i] << "\n";
       std::cout << "Vir : " << _Ptot[i] << "\n";
       //_scale_velocities(i,0.0000001);
     } 
-
+ 
     
     // if( i == floor(0.5*_nsteps))
     //   for(auto j : boost::irange(0,_nparticles))
@@ -30,7 +30,6 @@ void LArgon::_routine() {
       
     
     //slowly lower the temperature of the system.
-    
     for(auto j : boost::irange(0,_nparticles)) {
       for(int k = 0; k < 3; ++k) {
 	_r[i+1][j][k] = _r[i][j][k] + _v[i][j][k]*_t + 0.5*_f[i][j][k]*_t*_t; 
@@ -44,7 +43,7 @@ void LArgon::_routine() {
       }
     }
     
-
+    
     _F(i+1);
 
     for(auto j : boost::irange(0,_nparticles))
@@ -171,28 +170,51 @@ void LArgon::_F(const int& i) {
   //don't change this order will mess up image calculation
   //for(auto j : boost::irange(0,_nparticles)) // for each particle
   //#pragma omp parallel
-#pragma omp parallel for collapse(2)
+  //#pragma omp parallel for collapse(1)
+
+  double pe_ = 0.0;
+  double p_  = 0.0;
+#pragma omp parallel for reduction(+:pe_,p_)
   for(int j = 0 ; j  < _nparticles; ++j){ // for each particle
-    for(int k = 0; k < 3; ++k) { // for each direction
-      _f[i][j][k] = _force(i,j,k);
-    }
+    //    std::cout << "doing particle j: " << j << "\n";
+    //    for(int k = 0; k < 3; ++k) { // for each direction
+
+    auto xx = _force(i,j,0);
+    auto yy = _force(i,j,1);
+    auto zz = _force(i,j,2);
+
+    _f[i][j][0] = std::get<0>(xx);
+    _f[i][j][1] = std::get<0>(yy);
+    _f[i][j][2] = std::get<0>(zz);
+
+    pe_ += std::get<1>(xx) + std::get<1>(yy) + std::get<1>(zz);
+    p_  += std::get<2>(xx) + std::get<2>(yy) + std::get<2>(zz);
+    
+    //}
+    
   }
-  
+
+  _Ptot[i]  = p_;
+  _PEtot[i] = pe_;
 }
 
-double LArgon::_force(const int& i, const int& j, const int& k) {
+std::tuple<double,double,double> LArgon::_force(const int& i, const int& j, const int& k) {
   double ff_ = 0.0;
-  double de_;
+  double pe_ = 0.0;
+  double p_  = 0.0;
 
+  double de_;
+  
   //delete if not openMP
   std::array<double, 3> img_ = {0.0,0.0,0.0};
-  
-  for(auto l : boost::irange(0,_nparticles)) { // for each particle
-  //for(int l = 0 ; l < _nparticles; ++l) { // for each particle
+
+  //not worth it to openmp here, really want multicore higher up
+  for(int l = 0 ; l < _nparticles; ++l) { // for each particle openMP
+    //  for(auto l : boost::irange(0,_nparticles))
     de_ = 0.0; // reset the denominator before next particle...
     if(j != l) {
       //compute the ``image" distance, feed it the two particles,
-
+      
       //imcompatable with OPENMP each thread tries to fuck with global var scary
       //if(k == 0) { _img[l] = _image(_r[i][j],_r[i][l]); }
       img_ = _image(_r[i][j],_r[i][l]);
@@ -202,17 +224,19 @@ double LArgon::_force(const int& i, const int& j, const int& k) {
 		 (img_[b] - _r[i][j][b]));
       }
       
-      if(k == 0){ //update the potential only when x coordinate is seen
-	_PEtot[i]  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3));
-	_Ptot[i]   += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
+      if(k == 0) { //update the potential only when x coordinate is seen
+	//some type of instability here as multiple threads want
+	// to write to PEtot and Ptot simultaneously : - (
+	pe_  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3));
+	p_   += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
       }
       ff_ += 48 * (_r[i][j][k] - img_[k])*(pow(de_,-7) - 0.5*pow(de_,-4));
-
     }
-  }
+  }   
 
-  return ff_;
-  
+  return std::make_tuple(ff_,pe_,p_);
+    
+ 
 }
 void LArgon::_P(const int& i) { // Force will now to _P
 
