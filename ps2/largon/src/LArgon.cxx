@@ -328,16 +328,19 @@ void LArgon::_resize_all(const int& ns, const int& np) {
   _Ptot.resize(ns);
   _Ttot.resize(ns);
 
-  //Resize all vectors in the step
+  //Resize all vectors in the step, use a lambda
   
-  for(auto k : boost::irange(0,ns)) {
-  //  for(int k = 0; k< ns; ++k) {
-    _r[k].resize(np);
-    _v[k].resize(np);
-    _f[k].resize(np);
-  }
+  std::for_each(_r.begin(), _r.end(), [&np] (std::vector<std::array<double,3> > &par) {
+      list.resize(np);
+    });
+  std::for_each(_v.begin(), _v.end(), [&np] (std::vector<std::array<double,3> > &par) {
+      list.resize(np);
+    });
+  std::for_each(_f.begin(), _f.end(), [&np] (std::vector<std::array<double,3> > &par) {
+      list.resize(np);
+    });
   
-  _img.resize(np);
+  //_img.resize(np); // no useless with openmp
 
 }
 

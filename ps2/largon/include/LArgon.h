@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
+#include <algorithm>
 
 #include "boost/range/irange.hpp"
 #include "boost/random.hpp"
