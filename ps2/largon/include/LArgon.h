@@ -60,7 +60,6 @@ class LArgon : public TObject { // I guess we will derive from
   void _F(const int& i);
   void _K(const int& i);
   void _T(const int& i);
-  void _P(const int& i); // Force will now do Virial
   
   std::array<double, 3> _image(const std::array<double,3>& first,
 			       const std::array<double,3>& second);

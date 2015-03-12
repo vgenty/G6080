@@ -7,8 +7,6 @@
 
 #include "boost/program_options.hpp"
 
-#include <vector>
-#include <iostream>
 
 int main(int argc, char *argv[]) {
 
@@ -57,7 +55,7 @@ int main(int argc, char *argv[]) {
     
     auto in_file = std::make_shared<TFile>("output/out.root","READ");
     auto in_tree  = dynamic_cast<TTree*>(in_file->Get("outtree"));
-
+    
     in_tree->SetBranchAddress("LArgon",&b);
     in_tree->GetEntry(0); // There should be only one entry
     
@@ -70,6 +68,7 @@ int main(int argc, char *argv[]) {
     
     out_tree->Fill();
     out_tree->Write();
+
     out_file->Close();
     in_file->Close();
 
@@ -78,7 +77,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  
-  return 0;
+    return 0;
  
 }

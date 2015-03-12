@@ -28,8 +28,6 @@ void LArgon::_routine() {
     // 	for(int k = 0; k < 3; ++k)
     // 	  _v[i][j][k] *= -1.0;
       
-    
-    //slowly lower the temperature of the system.
     for(auto j : boost::irange(0,_nparticles)) {
       for(int k = 0; k < 3; ++k) {
 	_r[i+1][j][k] = _r[i][j][k] + _v[i][j][k]*_t + 0.5*_f[i][j][k]*_t*_t; 
@@ -43,7 +41,6 @@ void LArgon::_routine() {
       }
     }
     
-    
     _F(i+1);
 
     for(auto j : boost::irange(0,_nparticles))
@@ -52,8 +49,7 @@ void LArgon::_routine() {
     
     _T(i+1);
     _K(i+1);
-    _P(i+1);
-  
+    
   }
   std::cout << "Finished\n";
   
@@ -63,96 +59,101 @@ void LArgon::_routine() {
 
 void LArgon::_restart() {
   
-  _start = 0;
-    // Set initial velocity to zero
-  std::array<double,3> totV_ = {0.0,0.0,0.0};
-
-  //Some range of initial velocities
-  for(auto j : boost::irange(0,_nparticles)) {
-    _v[0][j] = {_get_ran_double(-1.0,1.0),
-		_get_ran_double(-1.0,1.0),
-		_get_ran_double(-1.0,1.0)};
+#pragma omp parallel sections
+  {
+#pragma omp section
+    {
+      _start = 0;
+      // Set initial velocity to zero
+      std::array<double,3> totV_ = {0.0,0.0,0.0};
     
-    totV_[0] += _v[0][j][0];
-    totV_[1] += _v[0][j][1];
-    totV_[2] += _v[0][j][2];
-  }
-  
-  // Make the cm velocity zero
-  for(int b = 0; b < 3; ++b)
-    totV_[b] /= _nparticles;
-  
-  
-  //remove CM motion
-  for(const auto& j : boost::irange(0,_nparticles))
-    for(int b = 0; b < 3; ++b)
-      _v[0][j][b] -= totV_[b];
-  
-  
+      //Some range of initial velocities
+      for(auto j : boost::irange(0,_nparticles)) {
+	_v[0][j] = {_get_ran_double(-1.0,1.0),
+		    _get_ran_double(-1.0,1.0),
+		    _get_ran_double(-1.0,1.0)};
+    
+	totV_[0] += _v[0][j][0];
+	totV_[1] += _v[0][j][1];
+	totV_[2] += _v[0][j][2];
+      }
+    
+      // Make the cm velocity zero
+      for(int b = 0; b < 3; ++b)
+	totV_[b] /= _nparticles;
   
   
-  //Scale all velocities to initial temperature
-  _scale_velocities(0,_Tinit);
+      //remove CM motion
+      for(auto j : boost::irange(0,_nparticles))
+	for(int b = 0; b < 3; ++b)
+	  _v[0][j][b] -= totV_[b];
   
-  // Figure out how we will partition all the particles
-  // we can put a cube root of the number of particles in each direction
+  
+      //Scale all velocities to initial temperature
+      _scale_velocities(0,_Tinit);
+    }
+    // Figure out how we will partition all the particles
+    // we can put a cube root of the number of particles in each direction
  
-  // TODO: tweak nside_ definition it's scary, lets get it working for a few _p
-  auto nside_ = int{static_cast<int>(std::floor(std::cbrt(_nparticles)))}; 
-  auto inc_   = double{_L/nside_};
-  auto cnt_   = int{0};
-  auto extra_ = double{_nparticles - pow(nside_,3.0)};
+    // TODO: tweak nside_ definition it's scary, lets get it working for a few _p
+#pragma omp section
+    {
+      auto nside_ = int{static_cast<int>(std::floor(std::cbrt(_nparticles)))}; 
+      auto inc_   = double{_L/nside_};
+      auto cnt_   = int{0};
+      auto extra_ = double{_nparticles - pow(nside_,3.0)};
 
 
-  std::cout << "Extra_: " << extra_ << " particles not in cubic" << std::endl;
-  std::cout << "Pre density: " << pow(nside_/_L,3.0) << std::endl;
-  std::cout << "nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
+      std::cout << "Extra_: " << extra_ << " particles not in cubic" << std::endl;
+      std::cout << "Pre density: " << pow(nside_/_L,3.0) << std::endl;
+      std::cout << "nside_: " << nside_ << " inc_: " << inc_ << " _L: " << _L << std::endl;
 
-  for(auto x : boost::irange(0,nside_)) { // x direction
-    for(auto y : boost::irange(0,nside_)) { // y direction
-      for(auto z : boost::irange(0,nside_)) { // z direction
-	_r[0][cnt_] = {x*inc_,y*inc_,z*inc_};
-	//std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
-	//	  << _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
-	cnt_++;
+      for(auto x : boost::irange(0,nside_)) { // x direction
+	for(auto y : boost::irange(0,nside_)) { // y direction
+	  for(auto z : boost::irange(0,nside_)) { // z direction
+	    _r[0][cnt_] = {x*inc_,y*inc_,z*inc_};
+	    //std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
+	    //	  << _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
+	    cnt_++;
+	  }
+	}
       }
-    }
-  }
   
-  //put the extras in like in fcc
-  if(extra_) {
-    for(auto x : boost::irange(0,nside_-1)) { // x direction
-      for(auto y : boost::irange(0,nside_-1)) { // y direction
- 	for(auto z : boost::irange(0,nside_-1)) { // z direction
- 	  _r[0][cnt_] = {(0.5+x)*inc_,(0.5+y)*inc_,(0.5+z)*inc_};
- 	  //std::cout << "cnt_ " << cnt_;
- 	  //std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
-	  //<< _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
+      //put the extras in like in fcc
+      if(extra_) {
+	for(auto x : boost::irange(0,nside_-1)) { // x direction
+	  for(auto y : boost::irange(0,nside_-1)) { // y direction
+	    for(auto z : boost::irange(0,nside_-1)) { // z direction
+	      _r[0][cnt_] = {(0.5+x)*inc_,(0.5+y)*inc_,(0.5+z)*inc_};
+	      //std::cout << "cnt_ " << cnt_;
+	      //std::cout << "r[0][" << cnt_ << "] = {" << _r[0][cnt_][0] << ","
+	      //<< _r[0][cnt_][1] << "," << _r[0][cnt_][2] << "}\n";
  	  
-	  if(_nparticles == cnt_) 
- 	    goto LABEL;
+	      if(_nparticles == cnt_) 
+		goto LABEL;
 	  
-  	  cnt_++;
-  	}
+	      cnt_++;
+	    }
+	  }
+	}
       }
+  
+    LABEL:
+      std::cout << "Post density: " << cnt_/pow(_L,3.0) << " on face centered cubic" << std::endl;
+  
+      if(_nparticles != cnt_){
+	std::cout << "Couldn't get the required density :- ( on partial FCC" << std::endl;
+	std::exit(0);
+      }
+      std::cout << "I put: " << cnt_ << " particles in the box just fine" << std::endl;
+      std::cout << "Initializing T,K,F,P\n" << std::endl;
+ 
     }
   }
-  
- LABEL:
-  std::cout << "Post density: " << cnt_/pow(_L,3.0) << " on face centered cubic" << std::endl;
-  
-  if(_nparticles != cnt_){
-    std::cout << "Couldn't get the required density :- ( on partial FCC" << std::endl;
-    std::exit(0);
-  }
-  std::cout << "I put: " << cnt_ << " particles in the box just fine" << std::endl;
-  std::cout << "Initializing T,K,F,P\n" << std::endl;
-  
   _T(0);
   _K(0);
   _F(0);
   _P(0);
-
 }
 
 void LArgon::_from_file(int more_steps) {
@@ -174,6 +175,7 @@ void LArgon::_F(const int& i) {
 
   double pe_ = 0.0;
   double p_  = 0.0;
+
 #pragma omp parallel for collapse(2) reduction(+:pe_,p_)
   for(int j = 0 ; j  < _nparticles; ++j){ // for each particle
     for(int k = 0; k < 3; ++k) { // for each direction
@@ -183,19 +185,6 @@ void LArgon::_F(const int& i) {
       pe_ += std::get<1>(xxx);
       p_ += std::get<1>(xxx);
     }
-    //auto is safe here I think it's really std::tie
-    // auto xx = _force(i,j,0);
-    // auto yy = _force(i,j,1);
-    // auto zz = _force(i,j,2);
-
-    // _f[i][j][0] = std::get<0>(xx);
-    // _f[i][j][1] = std::get<0>(yy);
-    // _f[i][j][2] = std::get<0>(zz);
-
-    // pe_ += std::get<1>(xx) + std::get<1>(yy) + std::get<1>(zz);
-    // p_  += std::get<2>(xx) + std::get<2>(yy) + std::get<2>(zz);
-    
-    //}
     
   }
 
@@ -231,7 +220,7 @@ std::tuple<double,double,double> LArgon::_force(const int& i, const int& j, cons
       
       if(k == 0) { //update the potential only when x coordinate is seen
 	//some type of instability here as multiple threads want
-	// to write to PEtot and Ptot simultaneously : - (
+	// to write to PEtot and Ptot simultaneously : - ( race condition
 	pe_  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3));
 	p_   += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
       }
@@ -242,13 +231,6 @@ std::tuple<double,double,double> LArgon::_force(const int& i, const int& j, cons
   return std::make_tuple(ff_,pe_,p_);
     
  
-}
-void LArgon::_P(const int& i) { // Force will now to _P
-
-  //For now let _P calculate just the virial 
-  
-  //_Ptot[i] *= 1/(6*_nparticles*_Ttot[i]);
-  //_Ptot[i]  = 1 - _Ptot[i];
 }
   
 std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
@@ -304,14 +286,14 @@ void LArgon::_scale_velocities(const int& i, const double& T){
    
   double sumsqs_ = 0.0;
   
-  for(auto j : boost::irange(0,_nparticles))
+  // rvalue reference works here.
+  for(auto &&j : boost::irange(0,_nparticles))
     for(int b = 0; b < 3; ++b)
       sumsqs_ += _v[i][j][b]*_v[i][j][b];
    
-  //double scale_ = sqrt( 3 * (_nparticles) * T / sumsqs_ );
   double scale_ = sqrt( (_nparticles) * T / (sumsqs_ * 16.0));
-   
-  for(auto j : boost::irange(0,_nparticles))
+
+  for(auto &&j : boost::irange(0,_nparticles))
     for(int b = 0; b < 3; ++b)
       _v[i][j][b] *= scale_;
 }
@@ -328,16 +310,16 @@ void LArgon::_resize_all(const int& ns, const int& np) {
   _Ptot.resize(ns);
   _Ttot.resize(ns);
 
-  //Resize all vectors in the step, use a lambda
+  //Resize all vectors in the step, use a lambda, this is probably easiest with boost zip who knows....
   
   std::for_each(_r.begin(), _r.end(), [&np] (std::vector<std::array<double,3> > &par) {
-      list.resize(np);
+      par.resize(np);
     });
   std::for_each(_v.begin(), _v.end(), [&np] (std::vector<std::array<double,3> > &par) {
-      list.resize(np);
+      par.resize(np);
     });
   std::for_each(_f.begin(), _f.end(), [&np] (std::vector<std::array<double,3> > &par) {
-      list.resize(np);
+      par.resize(np);
     });
   
   //_img.resize(np); // no useless with openmp
