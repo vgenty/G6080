@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(largon)
+project(mock_data)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/lib")
@@ -8,13 +8,13 @@ set(CMAKE_SHARED_LINKER_FLAGS "")
 set(CMAKE_EXE_LINKER_FLAGS "")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
-find_package(Boost REQUIRED COMPONENTS random program_options)
-include_directories("${Boost_INCLUDE_DIRS}")
-link_directories("${Boost_LIBRARY_DIR}")
-MESSAGE("Boost information:") 
-MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}") 
-MESSAGE("  Boost_LIBRARIES: ${Boost_LIBRARIES}") 
-MESSAGE("  Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}") 
+#find_package(Boost REQUIRED COMPONENTS random program_options)
+#include_directories("${Boost_INCLUDE_DIRS}")
+#link_directories("${Boost_LIBRARY_DIR}")
+#MESSAGE("Boost information:") 
+#MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}") 
+#MESSAGE("  Boost_LIBRARIES: ${Boost_LIBRARIES}") 
+#MESSAGE("  Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}") 
 
 find_package(ROOT REQUIRED)
 include_directories("${ROOT_INCLUDE_DIR}")
@@ -37,24 +37,25 @@ include_directories("${CMAKE_SOURCE_DIR}")
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
 ROOT_GENERATE_DICTIONARY(
-  LArgonDict
-  include/LArgon.h
+  AnalyzerDict
+  include/Analyzer.h
   LINKDEF include/LinkDef.h
   )
 
-file(GLOB largon_src
+file(GLOB analyzer_src
   "src/*.cxx"
   )
 
 add_library(
-  LArgon SHARED
-  ${largon_src}
-  LArgonDict
+  Analyzer SHARED
+  ${analyzer_src}
+  AnalyzerDict
   )
 
-add_executable(develop develop.cxx ${ROOT_LIBRARIES})
-target_link_libraries(develop LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(aye aye.cxx ${ROOT_LIBRARIES})
+#target_link_libraries(develop LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(aye Analyzer ${ROOT_LIBRARIES})
 
 if(ROOT6)
-  install(FILES ${CMAKE_BINARY_DIR}/LArgonDict_rdict.pcm DESTINATION "${CMAKE_SOURCE_DIR}/lib")
+  install(FILES ${CMAKE_BINARY_DIR}/AnalyzerDict_rdict.pcm DESTINATION "${CMAKE_SOURCE_DIR}/lib")
 endif()
