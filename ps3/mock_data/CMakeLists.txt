@@ -52,7 +52,7 @@ add_library(
   AnalyzerDict
   )
 
-add_executable(aye aye.cxx ${ROOT_LIBRARIES} ${Boost_LIBRARIES}xsx)
+add_executable(aye aye.cxx ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
 #target_link_libraries(develop LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(aye Analyzer ${ROOT_LIBRARIES})
 

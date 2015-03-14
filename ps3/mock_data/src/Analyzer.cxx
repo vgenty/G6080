@@ -34,7 +34,16 @@ Analyzer::Analyzer(std::string location) {
     }
   }
 
-  std::cout << _content[0]->at(NUMVALS-1) << "\n";
-						
+}
+
+void Analyzer::a() {
+  std::cout << "\t Part 1a\n";
   
+#pragma omp parallel for
+  for(int i = 0; i < NUMFILES; ++i)
+    _content[i]->calcPop();
+  
+  for_each(_content.begin(),_content.end(),[] (std::shared_ptr<Data> d) {
+      std::cout << (*d);
+    });
 }

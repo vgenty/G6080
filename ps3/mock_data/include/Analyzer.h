@@ -27,7 +27,9 @@ public:
   Analyzer(std::string location);
   
   virtual ~Analyzer() {}
-  
+
+
+  void a();
 private:
   std::vector<std::shared_ptr<Data> > _content;
   
