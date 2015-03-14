@@ -8,13 +8,13 @@ set(CMAKE_SHARED_LINKER_FLAGS "")
 set(CMAKE_EXE_LINKER_FLAGS "")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
-#find_package(Boost REQUIRED COMPONENTS random program_options)
-#include_directories("${Boost_INCLUDE_DIRS}")
-#link_directories("${Boost_LIBRARY_DIR}")
-#MESSAGE("Boost information:") 
-#MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}") 
-#MESSAGE("  Boost_LIBRARIES: ${Boost_LIBRARIES}") 
-#MESSAGE("  Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}") 
+find_package(Boost REQUIRED COMPONENTS program_options)
+include_directories("${Boost_INCLUDE_DIRS}")
+link_directories("${Boost_LIBRARY_DIR}")
+MESSAGE("Boost information:") 
+MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}") 
+MESSAGE("  Boost_LIBRARIES: ${Boost_LIBRARIES}") 
+MESSAGE("  Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}") 
 
 find_package(ROOT REQUIRED)
 include_directories("${ROOT_INCLUDE_DIR}")
@@ -52,7 +52,7 @@ add_library(
   AnalyzerDict
   )
 
-add_executable(aye aye.cxx ${ROOT_LIBRARIES})
+add_executable(aye aye.cxx ${ROOT_LIBRARIES} ${Boost_LIBRARIES}xsx)
 #target_link_libraries(develop LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
 target_link_libraries(aye Analyzer ${ROOT_LIBRARIES})
 

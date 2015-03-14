@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]) {
 
-  Analyzer a;
+  auto a = std::make_unique<Analyzer>("raw");
   
   return 0;
 }
