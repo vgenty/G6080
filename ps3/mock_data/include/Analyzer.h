@@ -30,9 +30,18 @@ public:
 
 
   void a();
+  void b();
+
+  //Getters
+  inline const std::vector<std::shared_ptr<Data> >& content() const;
+
 private:
   std::vector<std::shared_ptr<Data> > _content;
   
   ClassDef(Analyzer,1)
+  
 };
+
+inline const std::vector<std::shared_ptr<Data> >& Analyzer::content() const { return _content; }
+
 #endif

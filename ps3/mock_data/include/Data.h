@@ -29,6 +29,9 @@ public:
   double& at(int i)        { return _data[i]; }
 
 
+  inline const std::map<int, std::vector<std::pair<double,double> > >& samples() const;
+  inline const std::vector<double>& data() const;
+  
   //Friends
   friend std::ostream& operator<< (std::ostream& o, const Data& d) { o << d._name << " " << d._mean << " " << std::sqrt(d._var) <<  "\n";
     return o; }
@@ -47,10 +50,13 @@ private:
 
   inline const double& mean() const { return _mean; }
   inline const double& var () const { return _var; }
+
   
 protected:
   // no inheritance 
   
 };
 
+inline const std::map<int, std::vector<std::pair<double,double> > >& Data::samples() const { return _samps; }
+inline const std::vector<double>& Data::data() const { return _data; }
 #endif

@@ -37,7 +37,7 @@ Analyzer::Analyzer(std::string location) {
 }
 
 void Analyzer::a() {
-  std::cout << "\t Part 1a\n";
+  std::cout << "\n\t Part 1a\n";
   
 #pragma omp parallel for
   for(int i = 0; i < NUMFILES; ++i)
@@ -46,4 +46,18 @@ void Analyzer::a() {
   for_each(_content.begin(),_content.end(),[] (std::shared_ptr<Data> d) {
       std::cout << (*d);
     });
+}
+
+void Analyzer::b() {
+  std::cout << "\n\t Part 1b\n";
+
+
+  //Populating internal map
+  
+#pragma omp parallel for
+  for(int i = 0; i < NUMFILES; ++i) {
+    _content[i]->calcSam(1000 );
+    _content[i]->calcSam(10000);
+  }
+  
 }
