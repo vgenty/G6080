@@ -31,7 +31,9 @@ public:
 
   void a();
   void b();
-
+  void c(int n);
+  void d();
+  
   //Getters
   inline const std::vector<std::shared_ptr<Data> >& content() const;
 

@@ -20,7 +20,7 @@ void Data::calcPop() {
       t_ += (v-_mean)*(v-_mean);
     });
   
-  _var = t_/N_;
+  _var = t_/(N_-1);
   
 }
 
@@ -47,3 +47,21 @@ void Data::calcSam(int i) {
   }
 
 }
+
+void Data::calcAuto(int n) {
+  double s_ = 0.0;
+
+  for(auto i : boost::irange(0,NUMVALS - n) )
+    s_ += (_data[i+n] - _mean)*(_data[i] - _mean);
+  
+  _corrs.push_back(s_/(NUMVALS-n));
+    
+}
+
+void Data::calcAutoIntegrated() {
+  auto c_ = double{0.0};
+  std::for_each(_corrs.begin(),_corrs.end(),[&c_](double& v){ c_ += v; });
+  _integrated_corrs = c_/_corrs[0];
+  
+}
+

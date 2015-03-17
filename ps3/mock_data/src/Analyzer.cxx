@@ -61,3 +61,24 @@ void Analyzer::b() {
   }
   
 }
+
+void Analyzer::c(int n) {
+  std::cout << "\n\t Part 1c\n";
+  std::cout << "Calculating correlation with n = " << n << "\n";
+  
+#pragma omp parallel for
+  for(int i = 0; i < NUMFILES; ++i)
+    for(int j = 0; j <= n; ++j) // I think we repeated 0 but whatever
+    _content[i]->calcAuto(j);
+  
+}
+
+void Analyzer::d() {
+  std::cout << "\n\t Part 1d\n";
+  std::cout << "Integrated correlation time..." << "\n";
+
+#pragma omp parallel for
+  for(int i = 0; i < NUMFILES; ++i)
+    _content[i]->calcAutoIntegrated();
+  
+}
