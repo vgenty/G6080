@@ -1,5 +1,5 @@
 import ROOT
-from ROOT import TCanvas, TLatex, TH1D, TGraph
+from ROOT import TCanvas, TLatex, TH1D, TGraph, TH2D
 from looks import *
 
 ROOT.gSystem.Load('./lib/libAnalyzer.so');
@@ -66,7 +66,7 @@ def main():
         
         # Calculate the standard deviations of the sample means
     for i in xrange(5):
-        print "File v%d: 1k ~ %f 10k ~ %f ratio ~ %f" % (i,n.std(means1k[i]),n.std(means10k[i]),n.std(means1k[i])/n.std(means10k[i]))
+        print "File v%d: 1k ~ %f 10k ~ %f ratio ~ %f" % (i,n.std(means1k[i],ddof=1),n.std(means10k[i],ddof=1),n.std(means1k[i])/n.std(means10k[i]))
 
 
 
@@ -97,11 +97,30 @@ def main():
     for x in xrange(5):
         print "File v%d: integrated corr ~ %f " % (x,a.content()[x].integrated_correlation())
     
+
+
+    ##### Part E (5.) #####
+    a.e()
+    cc = TCanvas()
+    cc.cd()
+    
+    gStyle.SetPalette(55)
+    th2 = TH2D("basedgod","",5,1,6,5,1,6)
+
+    for x in xrange(5):
+        for y in xrange(5):
+             v = a.crosscorrelation()[x][y]
+             print "file: %d with file: %d is %f" % (x,y,v)
+             th2.SetBinContent(x+1,y+1,v)
+
+    th2.Draw("COLZ")
+    cc.Update()
+    cc.Modified()
     
     raw_input('')
-
     
-
-
+    
+    
+    
 if __name__ == '__main__':
     main()

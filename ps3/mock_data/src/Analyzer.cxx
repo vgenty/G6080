@@ -80,5 +80,32 @@ void Analyzer::d() {
 #pragma omp parallel for
   for(int i = 0; i < NUMFILES; ++i)
     _content[i]->calcAutoIntegrated();
+
+}
+
+void Analyzer::e() {
+  std::cout << "\n\t Part 1e\n";
+  std::cout << "Cross correlation matrix return 5x5 something...\n";
+
+  //Cross correlation matrix is symmetric but it's probably easier
+  //to over calculate instead of being careful
+
+
+  //don't know if I can pass Boost matrix to ROOT so use std::array...
+#pragma omp parallel for
+  for(int i = 0; i < 5; ++i){
+    for(int j = 0; j < 5; ++j) {
+      for(int k = 0; k < NUMVALS; ++k) {
+	_crosscorr[i][j] +=
+	  (_content[i]->data()[k] - _content[i]->mean()) *
+	  (_content[j]->data()[k] - _content[j]->mean());
+      }
+      //Normalize...
+      _crosscorr[i][j] /= (NUMVALS*_content[i]->stdev()*_content[j]->stdev());
+    }
+  }
+
+  
   
 }
+

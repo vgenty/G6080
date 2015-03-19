@@ -38,6 +38,12 @@ public:
   //Friends
   friend std::ostream& operator<< (std::ostream& o, const Data& d) { o << d._name << " " << d._mean << " " << std::sqrt(d._var) <<  "\n";
     return o; }
+
+  
+  inline const double& mean() const { return _mean; }
+  inline const double& var () const { return _var; }
+  inline const double stdev () const { return std::sqrt(_var); }
+
   
 private:
   std::string _name;
@@ -54,10 +60,6 @@ private:
   // Autocorrelation
   std::vector<double> _corrs;
   double _integrated_corrs;
-    
-  inline const double& mean() const { return _mean; }
-  inline const double& var () const { return _var; }
-
   
 protected:
   // no inheritance 
