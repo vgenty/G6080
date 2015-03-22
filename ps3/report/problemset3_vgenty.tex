@@ -6,6 +6,16 @@
 \usepackage{epsfig}
 \usepackage{listings}
 \usepackage[hidelinks,hyperfootnotes=false,bookmarks=false,colorlinks=true]{hyperref}
+
+\newcommand{\eq}[1]{\begin{align*}#1\end{align*}}
+\newcommand{\pmat}[1]{\begin{pmatrix}#1\end{pmatrix}}
+\newcommand{\center}[1]{\begin{center}#1\end{center}}
+\def\<{\langle}
+\def\>{\rangle}
+\def\l{\left}
+\def\r{\right}
+
+
 \begin{document}
 \title{Problem Set 2 - G6080}
 \author{Victor Genty}
@@ -23,5 +33,30 @@ Source code can be found at \href{https://github.com/vgenty/G6080/tree/master/ps
 \subsection{1}
 One
 \subsection{2}
-Calculation of standard deviation from native propagation of errors...
+Calculation of standard deviation from native propagation of errors...\\
+$\mathbf{f_1}$
+\eq{
+\sigma_{f_1}^2 &= \l(\frac{\partial f_1}{\partial \overline{v}_1}\r)^2\sigma_{\overline{v}_1}^2 + \l(\frac{\partial f_1}{\partial \overline{v}_2}\r)^2\sigma_{\overline{v}_2}^2,\\
+&=\l(\frac{1}{\overline{v}_2}\r)^2\sigma_{\overline{v}_1}^2 + \l(\frac{\overline{v}_1}{\overline{v}_2^2}\r)^2\sigma_{\overline{v}_2}^2,
+}
+so
+\eq{
+\boxed{\sigma_{f_1}=\sqrt{\l(\frac{1}{\overline{v}_2}\r)^2\sigma_{\overline{v}_1}^2 + \l(\frac{\overline{v}_1}{\overline{v}_2^2}\r)^2\sigma_{\overline{v}_2}^2}.}
+}
+$\mathbf{f_2}$
+\eq{\sigma_{f_2}^2 &= \l(\frac{\partial f_2}{\partial \overline{v}_3}\r)^2\sigma_{\overline{v}_3}^2 + \l(\frac{\partial f_2}{\partial \overline{v}_4}\r)^2\sigma_{\overline{v}_4}^2,\\ 
+  &=\exp\l(2(\overline{v}_3-\overline{v}_4)\r)\l(\sigma_{\overline{v}_3}^2+\sigma_{\overline{v}_4}^2\r),
+}
+so
+\eq{
+\boxed{ \sigma_{f_2} = \exp\l(\overline{v}_3-\overline{v}_4\r)\sqrt{\sigma_{\overline{v}_3}^2+\sigma_{\overline{v}_4}^2}}.
+}
+$\mathbf{f_3}$
+\eq{
+\sigma_{f_3}^2 &= \l(\frac{\partial f_3}{\partial \overline{v}_1}\r)^2\sigma_{\overline{v}_1}^2 + \l(\frac{\partial f_3}{\partial \overline{v}_2}\r)^2\sigma_{\overline{v}_2}^2 + \l(\frac{\partial f_3}{\partial \overline{v}_3}\r)^2\sigma_{\overline{v}_3}^2 + \l(\frac{\partial f_3}{\partial \overline{v}_4}\r)^2\sigma_{\overline{v}_4}^2 + \l(\frac{\partial f_3}{\partial \overline{v}_5}\r)^2\sigma_{\overline{v}_5}^2,
+}
+so
+\eq{
+\boxed{\sigma_{f_3} = \sqrt{\log^2(\overline{v}_5) \left(\frac{\overline{v}_1^2 \sigma_{\overline{v}_2}^2}{\overline{v}_2^4}+\frac{\sigma_{\overline{v}_1}^2}{\overline{v}_2^2}+\frac{\overline{v}_3^2 \sigma_{\overline{v}_4}^2}{\overline{v}_4^4}+\frac{\sigma_{\overline{v}_3}^2}{\overline{v}_4^2}\right)+\frac{\sigma_{\overline{v}_5}^2 (\overline{v}_1 \overline{v}_4+\overline{v}_2 \overline{v}_3)^2}{\overline{v}_2^2\,\overline{v}_4^2\,\overline{v}_5^2}}}
+}
 \end{document}
