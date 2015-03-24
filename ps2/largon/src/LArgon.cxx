@@ -153,7 +153,6 @@ void LArgon::_restart() {
   _T(0);
   _K(0);
   _F(0);
-  _P(0);
 }
 
 void LArgon::_from_file(int more_steps) {
@@ -211,6 +210,9 @@ std::tuple<double,double,double> LArgon::_force(const int& i, const int& j, cons
       
       //imcompatable with OPENMP each thread tries to fuck with global var scary
       //if(k == 0) { _img[l] = _image(_r[i][j],_r[i][l]); }
+
+      //TODO: _de is calculated 3 times when it should only be calculated once... one possible slow down
+      
       img_ = _image(_r[i][j],_r[i][l]);
 
       for(int b = 0; b < 3; ++b) {
@@ -221,10 +223,10 @@ std::tuple<double,double,double> LArgon::_force(const int& i, const int& j, cons
       if(k == 0) { //update the potential only when x coordinate is seen
 	//some type of instability here as multiple threads want
 	// to write to PEtot and Ptot simultaneously : - ( race condition
-	pe_  += 4*(0.5)*(pow(de_,-6) - pow(de_,-3));
-	p_   += (48)*(pow(de_,-6) - 0.5*pow(de_,-3)); 
+	pe_  += 4*(0.5)*(1/pow(de_,6) - 1/pow(de_,3));
+	p_   += (48)*(1/pow(de_,6) - 0.5*1/pow(de_,3)); 
       }
-      ff_ += 48 * (_r[i][j][k] - img_[k])*(pow(de_,-7) - 0.5*pow(de_,-4));
+      ff_ += 48 * (_r[i][j][k] - img_[k])*(1/pow(de_,7) - 0.5*1/pow(de_,4));
     }
   }   
 
