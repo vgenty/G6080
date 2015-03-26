@@ -74,9 +74,38 @@ We estimate a value of $n_{\text{cut}}=125$. A small deviation in $n_{\text{cut}
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c |}\hline
   $\tau_{\text{int},\overline{v}_1}$ &  $\tau_{\text{int},\overline{v}_2}$ &  $\tau_{\text{int},\overline{v}_3}$ &  $\tau_{\text{int},\overline{v}_4}$ &  $\tau_{\text{int},\overline{v}_5}$  \\ \hline \hline 
-  41.73 & 42.38 & 40.03 & 42.77 & 49.02 \\ \hline
+  42.455 & 43.079 & 40.448 & 44.018 & 42.344 \\ \hline
 \end{tabular}
 \end{center}
+\subsection{5}
+The true standard deviations of the data are reported in the table below.
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\hat{\sigma}_{\overline{v}_1}$ &  $\hat{\sigma}_{\overline{v}_2}$ &  $\hat{\sigma}_{\overline{v}_3}$ &  $\hat{\sigma}_{\overline{v}_4}$ &  $\hat{\sigma}_{\overline{v}_5}$  \\ \hline \hline 
+  0.8668 & 0.6795 & 0.6377 & 0.6761 & 0.8618 \\ \hline
+\end{tabular}
+\end{center}
+The relation,
+\eq{
+\hat{\sigma}_{\overline{v}_a,N}=\sqrt{\frac{2\hat{\tau}_{\text{int},\overline{v}_a}}{N}}\hat{\sigma_{v_a}},
+}
+hold just fine for the data set. Consider the first set $N=1000$,
+\eq{
+\hat{\sigma}_{\overline{v}_a,N} = (0.866)\l(\sqrt{\frac{2\cdot42.455}{1000}}\r) =  0.252 \approx 0.241.
+}
+\subsection{6}
+The true covarience matrix between the data sets is shown in Fig. \ref{comatrix}.
+\begin{figure}
+\centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/e1.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/e2.eps}}\\
+\hfill
+\caption{\label{comatrix} Covariance matrix between 5 universe data sets. The left pane is a 2D histogram and in the right plane an equivalent ``surf'' plot generated with ROOT. The Z axis on both plots is the autocorrelation result.}
+\end{figure}
+\clearpage
+\subsection{7}
+
 \section{Problem 2 - Jackknife of Mock Data}
 \subsection{1}
 One
