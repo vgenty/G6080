@@ -1,5 +1,5 @@
 import ROOT
-from ROOT import TCanvas, TLatex, TH1D, TGraph, TH2D
+from ROOT import TCanvas, TLatex, TH1D, TGraph, TH2D, TLegend, TPaveText
 from looks import *
 
 ROOT.gSystem.Load('./lib/libAnalyzer.so');
@@ -24,6 +24,8 @@ def main():
 
         
     cans_B = [TCanvas() for t in xrange(5)]
+    tl     = [TLegend(0.6,0.4,0.9,0.8) for t in xrange(5)]
+    title  = [TPaveText(0.549569,0.8241525,0.950431,0.8983051,"nbNDC") for t in xrange(5)]
     b1k    = [TH1D("N1k_set_%d" % (t+1),"",100,0,10) for t in xrange(5)]
     b10k   = [TH1D("N10k_set_%d" % (t+1),"",100,0,10) for t in xrange(5)]
 
@@ -60,9 +62,23 @@ def main():
         b10k[i].SetFillColor(2)
         b10k[i].SetFillStyle(3354)
 
+        title[i].SetFillColor(0);
+        title[i].SetFillStyle(0);
+        title[i].SetLineColor(0);
+        title[i].AddText("File v%d" % (i+1))
+                             
+        
+        tl[i].AddEntry(b1k[i],"1k","f")
+        tl[i].AddEntry(0,"Mean: %0.2f" % b1k[i].GetMean()      ,"")
+        tl[i].AddEntry(0,"STD : %0.2f" % b1k[i].GetRMS(),"")
+        tl[i].AddEntry(b10k[i],"10k","f")
+        tl[i].AddEntry(0,"Mean: %0.2f" % b10k[i].GetMean(),"")
+        tl[i].AddEntry(0,"STD : %0.2f" % b10k[i].GetRMS(),"")
+        
         b1k[i].Draw()
         b10k[i].Draw("SAMES")
-        
+        tl[i].Draw()
+        title[i].Draw()
         
         # Calculate the standard deviations of the sample means
     for i in xrange(5):
@@ -85,7 +101,16 @@ def main():
         for j in xrange(len(corrs[x])):
            tgc[x].SetPoint(j,j,corrs[x][j]/corrs[x][0])
     
+        tgc[x].GetXaxis().SetTitle("n")
+        tgc[x].GetYaxis().SetTitle("C_{v%i}(n)/C_{v%i}(0)" % (x+1,x+1))
+
+        tgc[x].GetXaxis().CenterTitle()
+        tgc[x].GetYaxis().CenterTitle()
+
+        tgc[x].SetLineWidth(2)
         tgc[x].Draw("AL")
+        title[x].Draw()
+
         tcc[x].Update()
         tcc[x].Modified()
 

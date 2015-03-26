@@ -60,7 +60,10 @@ void Data::calcAuto(int n) {
 
 void Data::calcAutoIntegrated() {
   auto c_ = double{0.0};
-  std::for_each(_corrs.begin(),_corrs.end(),[&c_](double& v){ c_ += v; });
+  //std::for_each(_corrs.begin(),_corrs.end(),[&c_](double& v){ c_ += v; });
+  for(int k = 0; k < 125; ++k)
+    c_ += v;
+  
   _integrated_corrs = c_/_corrs[0];
   
 }
