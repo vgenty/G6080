@@ -29,6 +29,54 @@ Source code can be found at \href{https://github.com/vgenty/G6080/tree/master/ps
 \end{abstract}
 \maketitle
 \section{Problem 1 - Stats of Mock Data}
+\subsection{1.}
+The true means for the 5 data sets for all 1,600,000 values are:
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\overline{v}_1$ &  $\overline{v}_2$ &  $\overline{v}_3$ &  $\overline{v}_4$ &  $\overline{v}_5$  \\ \hline \hline 
+  1.76084 & 2.88634 & 4.01185 & 5.13712 & 6.26238 \\ \hline
+\end{tabular}
+\end{center}
+\subsection{2.}
+Histograms of sample means are shown in Fig. \ref{histos}. As the number of values in each sample increased, the standard deviation of the means is reduced by a factor of 
+\eq{
+\delta\sigma\approx\frac{1}{\sqrt{N}}\sim\frac{1}{\sqrt{10}},
+}
+as expected.
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/b1.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/b2.eps}}\\
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/b3.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/b4.eps}}\\
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/b5.eps}}
+\hfill
+  \caption{\label{histos} Histogram of sample means for 5 data sets. The blue shaded histogram contains the sample means for samples of size 1,000. The red histogram contains the sample means for samples of size 10,000. Increasing the number of sample means in each sample has the expected effect of narrowing the distribution.}
+\end{figure}
+\clearpage
+\subsection{3}
+We compute the true autocorrelation function for each of the data sets with the formula given in the problem. The normalized autocorrelation function $C_{v_a}(n)/C_{v_a}(0)$ for each data set is plotted versus $n_{\text{cut}}$ and shown in Fig. \ref{corrs}. The value of $n$ (or $n_{\text{cut}}$ which the auto-correlations disappear is roughly 100.
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/c1.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/c2.eps}}\\
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/c3.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/c4.eps}}\\
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/c5.eps}}
+\hfill
+  \caption{\label{corrs} Correlation functions for each of the data sets. It appears each set has auto-correlations on the order of 100 data points.}
+\end{figure}
+\clearpage
+\subsection{4}
+We estimate a value of $n_{\text{cut}}=125$. A small deviation in $n_{\text{cut}}$ around this value will not effect the integrated correlation time much. With this value we find the integrated correlation time for each of the data sets as,
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\tau_{\text{int},\overline{v}_1}$ &  $\tau_{\text{int},\overline{v}_2}$ &  $\tau_{\text{int},\overline{v}_3}$ &  $\tau_{\text{int},\overline{v}_4}$ &  $\tau_{\text{int},\overline{v}_5}$  \\ \hline \hline 
+  41.73 & 42.38 & 40.03 & 42.77 & 49.02 \\ \hline
+\end{tabular}
+\end{center}
 \section{Problem 2 - Jackknife of Mock Data}
 \subsection{1}
 One
