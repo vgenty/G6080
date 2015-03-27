@@ -31,7 +31,8 @@ void Data::calcSam(int i) {
   double var_   = 0.0;
   
   for(int j = 1; j <= div_; ++j) {
-    
+
+    //datasamples[j][i]
     //do the mean
     for(int k = i*(j-1); k < i*j; ++k) { mean_ += _data[k]; }
     mean_ /= i;
@@ -58,11 +59,11 @@ void Data::calcAuto(int n) {
     
 }
 
-void Data::calcAutoIntegrated() {
+void Data::calcAutoIntegrated(int a) {
   auto c_ = double{0.0};
   //std::for_each(_corrs.begin(),_corrs.end(),[&c_](double& v){ c_ += v; });
-  for(int k = 0; k < 125; ++k)
-    c_ += v;
+  for(int k = 0; k < a; ++k)
+    c_+= _corrs[k];
   
   _integrated_corrs = c_/_corrs[0];
   

@@ -34,7 +34,9 @@ public:
   void c(int n);
   void d();
   void e();
-  
+
+
+  void three();
   //Getters
   inline const std::vector<std::shared_ptr<Data> >& content() const;
   inline const std::array<std::array<double,5>,5>& crosscorrelation() const;

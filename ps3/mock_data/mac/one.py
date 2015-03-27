@@ -82,9 +82,10 @@ def main():
         
         # Calculate the standard deviations of the sample means
     for i in xrange(5):
-        print "File v%d: 1k ~ %f 10k ~ %f ratio ~ %f" % (i,n.std(means1k[i],ddof=1),n.std(means10k[i],ddof=1),n.std(means1k[i])/n.std(means10k[i]))
-
-
+        print "File v%d: 1k ~ %f 10k ~ %f ratio ~ %f" % (i,
+                                                         n.std(means1k[i],ddof=1),
+                                                         n.std(means10k[i],ddof=1),
+                                                         n.std(means1k[i])/n.std(means10k[i]))
 
 
     ###### Part C (3.) ######
@@ -128,7 +129,9 @@ def main():
     a.e()
     cc = TCanvas()
     cc.cd()
-    
+
+    cc2 = TCanvas()
+    cc.cd()
     gStyle.SetPalette(55)
     th2 = TH2D("basedgod","",5,1,6,5,1,6)
 
@@ -138,11 +141,20 @@ def main():
              print "file: %d with file: %d is %f" % (x,y,v)
              th2.SetBinContent(x+1,y+1,v)
 
+    th2.GetXaxis().SetTitle("Data v_a")
+    th2.GetYaxis().SetTitle("Data v_a")
+    th2.GetXaxis().CenterTitle()
+    th2.GetYaxis().CenterTitle()
+    
     th2.Draw("COLZ")
     cc.Update()
     cc.Modified()
-    
+    cc2.cd()
+    th2.Draw("SURF1")
+    cc2.Update()
+    cc2.Modified()
     raw_input('')
+    
     
     
     

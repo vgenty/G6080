@@ -79,7 +79,7 @@ void Analyzer::d() {
 
 #pragma omp parallel for
   for(int i = 0; i < NUMFILES; ++i)
-    _content[i]->calcAutoIntegrated();
+    _content[i]->calcAutoIntegrated(125);
 
 }
 
@@ -108,3 +108,10 @@ void Analyzer::e() {
   
 }
 
+
+void Analyzer:three() {
+
+  
+  
+  
+}

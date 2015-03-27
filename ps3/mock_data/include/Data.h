@@ -23,7 +23,7 @@ public:
   void calcPop(); //Calculate population parameters
   void calcSam(int i); //Calculate sample parameters
   void calcAuto(int n); // n autocorrelation spacing, keep it n because we could kill it 
-  void calcAutoIntegrated();
+  void calcAutoIntegrated(int a);
   
   //Getters and setter
   double  at(int i) const  { return _data[i]; }
@@ -34,7 +34,8 @@ public:
   inline const std::vector<double>& data() const;
   inline const std::vector<double>& correlation() const;
   inline const double& integrated_correlation() const;
-  //  inline const std::vector<std::vector<double> > datasamples() const;
+  inline const std::vector<std::vector<double> >& datasamples1k () const;
+  inline const std::vector<std::vector<double> >& datasamples10k() const;
 
   //Friends
   friend std::ostream& operator<< (std::ostream& o, const Data& d) { o << d._name << " " << d._mean << " " << std::sqrt(d._var) <<  "\n";
@@ -64,7 +65,8 @@ private:
 
 
   // used for part 2
-  //std::vector<std::vector<double> > _datasamples;
+  std::vector<std::vector<double> > _datasamples1k ;
+  std::vector<std::vector<double> > _datasamples10k;
 protected:
   // no inheritance 
   
@@ -74,7 +76,8 @@ protected:
 inline const double& Data::integrated_correlation() const { return _integrated_corrs;}
 
 inline const std::map<int, std::vector<std::pair<double,double> > >& Data::samples() const { return _samps; }
-//inline const std::vector<std::vector<double> > & Data::datasamples() const { return _datasamples; }
+inline const std::vector<std::vector<double> > & Data::datasamples1k() const { return _datasamples1k; }
+inline const std::vector<std::vector<double> > & Data::datasamples10k() const { return _datasamples10k; }
 inline const std::vector<double>& Data::correlation() const { return _corrs; }
 inline const std::vector<double>& Data::data() const { return _data; }
 #endif
