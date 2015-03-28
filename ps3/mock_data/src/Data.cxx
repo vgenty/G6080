@@ -29,13 +29,19 @@ void Data::calcSam(int i) {
   double div_   = static_cast<double>(NUMVALS)/static_cast<double>(i);
   double mean_  = 0.0;
   double var_   = 0.0;
+
+  std::vector<double> _o;
+  std::vector<std::vector<double > > _oo;
   
   for(int j = 1; j <= div_; ++j) {
 
     //datasamples[j][i]
-    //do the mean
-    for(int k = i*(j-1); k < i*j; ++k) { mean_ += _data[k]; }
+    //do the meanbth
+    for(int k = i*(j-1); k < i*j; ++k) { mean_ += _data[k]; _o.push_back(_data[k]);}
     mean_ /= i;
+
+    _oo.push_back(_o);
+    _o.clear();
     
     // do the var
     for(int k = i*(j-1); k < i*j; ++k) { var_ += (_data[k] - mean_)*(_data[k] - mean_); }
@@ -47,6 +53,9 @@ void Data::calcSam(int i) {
     var_  = 0.0;
   }
 
+  if( i == 1000 ) { _datasamples1k  = _oo; }
+  if( i == 10000) { _datasamples10k = _oo; }
+  
 }
 
 void Data::calcAuto(int n) {
