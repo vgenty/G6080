@@ -56,7 +56,7 @@ as expected.
 \end{figure}
 \clearpage
 \subsection{3}
-We compute the true autocorrelation function for each of the data sets with the formula given in the problem. The normalized autocorrelation function $C_{v_a}(n)/C_{v_a}(0)$ for each data set is plotted versus $n_{\text{cut}}$ and shown in Fig. \ref{corrs}. The value of $n$ (or $n_{\text{cut}}$ which the auto-correlations disappear is roughly 100.
+We compute the true autocorrelation function for each of the data sets with the formula given in the problem. The normalized autocorrelation function $C_{v_a}(n)/C_{v_a}(0)$ for each data set is plotted versus $n_{\text{cut}}$ and shown in Fig. \ref{corrs}. The value of $n$ (or $n_{\text{cut}}$) which the auto-correlations disappear is roughly 100.
 \begin{figure}[h]
   \centering
   \captionsetup[subfigure]{labelformat=empty}
@@ -103,7 +103,50 @@ The true covarience matrix between the data sets is shown in Fig. \ref{comatrix}
 \end{figure}
 \clearpage
 \subsection{7}
-
+\begin{center}The code for this problem can be found in \verb|mock_data/mac/secret7.py|. \end{center}
+We choose two groups from the full universe of data. One set has $N=1000$ and the other has $N=10000$ representing data from simulation. The autocorrelation function from each of the two groups is plotted in Fig. \ref{ok} for the second data set. Choosing a definite value for $n_{\text{cut}}$ is difficult. We choose $n_{\text{cut}}$ at about 80. The integrated correlation time, standard deviation computed via equation 4 are plotted in the tables below. The two covariance matricies are shown in Fig. \ref{oc}.\\
+{\bf N = 1,000}
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\tau_{\overline{v}_1}$ &  $\tau_{\overline{v}_2}$ &  $\tau_{\overline{v}_3}$ &  $\tau_{\overline{v}_4}$ &  $\tau_{\overline{v}_5}$  \\ \hline \hline 
+  42.77605 & 46.42773 & 43.5985 & 39.1126 & 35.12261  \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\hat{\sigma}_{\overline{v}_1}$ &  $\hat{\sigma}_{\overline{v}_2}$ &  $\hat{\sigma}_{\overline{v}_3}$ &  $\hat{\sigma}_{\overline{v}_4}$ &  $\hat{\sigma}_{\overline{v}_5}$  \\ \hline \hline 
+  0.24076 & 0.21408 & 0.19337 & 0.16865 & 0.19186 \\ \hline
+\end{tabular}
+\end{center}
+{\bf N = 10,000}
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\tau_{\overline{v}_1}$ &  $\tau_{\overline{v}_2}$ &  $\tau_{\overline{v}_3}$ &  $\tau_{\overline{v}_4}$ &  $\tau_{\overline{v}_5}$  \\ \hline \hline 
+  45.2085 & 47.03129 & 44.13091 & 44.04701 & 41.29598 \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c |}\hline
+  $\hat{\sigma}_{\overline{v}_1}$ &  $\hat{\sigma}_{\overline{v}_2}$ &  $\hat{\sigma}_{\overline{v}_3}$ &  $\hat{\sigma}_{\overline{v}_4}$ &  $\hat{\sigma}_{\overline{v}_5}$  \\ \hline \hline 
+  0.08663 & 0.06854 & 0.060458 & 0.062144 & 0.076472 \\ \hline
+\end{tabular}
+\end{center}
+Compare these standard deviation values to those seen in the plots of Problem 1 section 2 for each of the data sets. The calculated standard deviations here match those in section 2 {\it closely}!
+\begin{figure}[h]
+\centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/7one.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/7two.eps}}\\
+\caption{\label{ok} Normalized autocorrelation from two samples of differente sizes in the second data set.}
+\end{figure}
+\begin{figure}[h]
+\centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/7corr.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/7corr2.eps}}\\
+\caption{\label{ok} Normalized autocorrelation from two samples of differente sizes in the second data set. As N is increased from 1,000 to 10,000, the cross correlation between samples appears to decrease.}
+\end{figure}
+\clearpage
 \section{Problem 2 - Jackknife of Mock Data}
 \begin{center}The code for this problem can be found in \verb|mock_data/mac/two.py|. \end{center}
 \subsection{1}
