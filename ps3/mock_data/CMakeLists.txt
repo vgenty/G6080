@@ -52,9 +52,9 @@ add_library(
   AnalyzerDict
   )
 
-add_executable(aye aye.cxx ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
+#add_executable(aye aye.cxx ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
 #target_link_libraries(develop LArgon ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(aye Analyzer ${ROOT_LIBRARIES})
+target_link_libraries(Analyzer ${ROOT_LIBRARIES})
 
 if(ROOT6)
   install(FILES ${CMAKE_BINARY_DIR}/AnalyzerDict_rdict.pcm DESTINATION "${CMAKE_SOURCE_DIR}/lib")

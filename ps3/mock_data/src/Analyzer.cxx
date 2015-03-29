@@ -79,7 +79,7 @@ void Analyzer::d() {
 
 #pragma omp parallel for
   for(int i = 0; i < NUMFILES; ++i)
-    _content[i]->calcAutoIntegrated();
+    _content[i]->calcAutoIntegrated(125);
 
 }
 
@@ -108,3 +108,68 @@ void Analyzer::e() {
   
 }
 
+
+void Analyzer::three(int nmax,int N) {
+
+  double C_ = 0.0;
+
+  std::vector<double> CS_;
+  std::vector<double> tint_;
+
+  // samples size is 1000
+  int t_ = NUMVALS/N;
+  int N_ = N;
+  
+  // for(auto& k : _content[0]->samples()) {
+  //   std::cout << k.first << std::endl;
+  //   std::cout << k.second.size() << std::endl;
+  //   std::cout << k.second[0].first << std::endl;
+  // }
+  
+  auto s = _content[0]->samples(); //what the fuck why do i have to do this??
+  std::vector<std::vector<double> > d; //trick compiler into thinking d exists tehe: - )
+  
+  if(N == 1000)
+    d = _content[0]->datasamples1k();
+  else if (N == 10000)
+    d = _content[0]->datasamples10k();
+  else
+    std::exit(0);
+  
+  //std::cout << _content[0]->samples()[1000].size();
+  
+  _samples_tint.clear();
+  
+
+  std::cout << "calling analyzer::three with nmax = " << nmax << "\n";
+  //currently only doing the first file!!!
+  for(int j = 0; j < t_; ++j) { //loop over all samples
+    for(int n = 0; n < nmax; ++n) { //loop over n values...
+      for(int i = 0; i < N_ - n; ++i) { //actually loop
+	C_ += (d[j][i+n] - s[N_][j].first)*
+	  (d[j][i]- s[N_][j].first);
+      }
+      
+      C_ /= static_cast<double>((N_- n));
+      CS_.push_back(C_);
+      C_ = 0.0;
+    } //end n
+    
+      //CS_ now has a vector of Cn's up to nmax, now sum them up (integrate them)
+    
+    double counter = 0.0;
+    
+    std::for_each(CS_.begin(),CS_.end(),[&counter](double& C){counter += C; });
+    
+    tint_.push_back(counter/CS_[0]);
+    
+    CS_.clear();
+  } //end j
+  std::cout << tint_.size() << "\n";
+  _samples_tint.push_back(tint_);
+  tint_.clear();
+  // end files
+  
+}
+    
+      

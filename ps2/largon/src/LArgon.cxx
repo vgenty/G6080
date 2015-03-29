@@ -166,75 +166,37 @@ void LArgon::_from_file(int more_steps) {
 }
 
 void LArgon::_F(const int& i) {
-  
-  //don't change this order will mess up image calculation
-  //for(auto j : boost::irange(0,_nparticles)) // for each particle
-  //#pragma omp parallel
-  //#pragma omp parallel for collapse(1)
 
   double pe_ = 0.0;
   double p_  = 0.0;
 
 #pragma omp parallel for collapse(2) reduction(+:pe_,p_)
   for(int j = 0 ; j  < _nparticles; ++j){ // for each particle
-    for(int k = 0; k < 3; ++k) { // for each direction
-      auto xxx = _force(i,j,k);
+    for(int l = 0 ; l  < _nparticles; ++l){ // for each particle
 
-      _f[i][j][k] = std::get<0>(xxx);
-      pe_ += std::get<1>(xxx);
-      p_ += std::get<1>(xxx);
-    }
-    
-  }
-
+      std::array<double, 3> img_ = {0.0,0.0,0.0};
+      double de_ = 0.0;
+	
+      if(j != l) {
+	img_ = _image(_r[i][j],_r[i][l]);
+	
+	for(int b = 0; b < 3; ++b) {
+	  de_ +=  ((img_[b] - _r[i][j][b]) *
+		   (img_[b] - _r[i][j][b]));
+	}
+      
+	pe_  += 4*(0.5)*(1/pow(de_,6) - 1/pow(de_,3));
+	p_   += (48)*(1/pow(de_,6) - 0.5*1/pow(de_,3)); 
+	
+      	for(int b = 0; b < 3; ++b)
+	  _f[i][j][b] += 48 * (_r[i][j][b] - img_[b])*(1/pow(de_,7) - 0.5*1/pow(de_,4));
+      }
+    } 
+  }  
   _Ptot[i]  = p_;
   _PEtot[i] = pe_;
 }
 
-std::tuple<double,double,double> LArgon::_force(const int& i, const int& j, const int& k) {
-  double ff_ = 0.0;
-  double pe_ = 0.0;
-  double p_  = 0.0;
-
-  double de_;
-  
-  //delete if not openMP
-  std::array<double, 3> img_ = {0.0,0.0,0.0};
-
-  //not worth it to openmp here, really want multicore higher up
-  for(int l = 0 ; l < _nparticles; ++l) { // for each particle openMP
-    //  for(auto l : boost::irange(0,_nparticles))
-    de_ = 0.0; // reset the denominator before next particle...
-    if(j != l) {
-      //compute the ``image" distance, feed it the two particles,
-      
-      //imcompatable with OPENMP each thread tries to fuck with global var scary
-      //if(k == 0) { _img[l] = _image(_r[i][j],_r[i][l]); }
-
-      //TODO: _de is calculated 3 times when it should only be calculated once... one possible slow down
-      
-      img_ = _image(_r[i][j],_r[i][l]);
-
-      for(int b = 0; b < 3; ++b) {
-	de_ +=  ((img_[b] - _r[i][j][b]) *
-		 (img_[b] - _r[i][j][b]));
-      }
-      
-      if(k == 0) { //update the potential only when x coordinate is seen
-	//some type of instability here as multiple threads want
-	// to write to PEtot and Ptot simultaneously : - ( race condition
-	pe_  += 4*(0.5)*(1/pow(de_,6) - 1/pow(de_,3));
-	p_   += (48)*(1/pow(de_,6) - 0.5*1/pow(de_,3)); 
-      }
-      ff_ += 48 * (_r[i][j][k] - img_[k])*(1/pow(de_,7) - 0.5*1/pow(de_,4));
-    }
-  }   
-
-  return std::make_tuple(ff_,pe_,p_);
-    
- 
-}
-  
 std::array<double, 3> LArgon::_image(const std::array<double,3>& one_,
 				     const std::array<double,3>& two_) {
   
