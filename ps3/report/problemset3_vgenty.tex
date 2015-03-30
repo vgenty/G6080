@@ -245,7 +245,11 @@ We investigate the error on $\tau_{\text{int}}$ We choose two values for $N$ (10
 \end{figure}
 \clearpage
 \section{Problem 4 - LArgon Stats}
-We have evolved the Liquid argon simulation with $1000$ particles over 5000 steps with a density of 1.0. The plots for autocorrelation in the potential energy, temperature, and the virial are shown in Fig. \ref{lauto}. From inspection of the autocorrelation plots, a suitable value of $n_{\text{cut}}$ should be approximately {\bf 200}. The correlation matrix for the three variables is shown in Fig. \ref{larcorr}. The potential energy and virial variables are completely correlated as they are both derived from the same function. On the other hand the temperature is completely anti-correlated as expected due to conservation of total energy. The temperature is derived from the kinetic energy which is contrained by the potential, hence the variables are anti-correlated. 
+We have evolved the Liquid argon simulation with $1000$ particles over 5000 steps with a density of 1.0. The plots for autocorrelation in the potential energy, temperature, and the virial are shown in Fig. \ref{lauto}. From inspection of the autocorrelation plots, a suitable value of $n_{\text{cut}}$ should be approximately {\bf 200}. The correlation matrix for the three variables is shown in Fig. \ref{larcorr}. The potential energy and virial variables are completely correlated as they are both derived from the same function. On the other hand the temperature is completely anti-correlated as expected due to conservation of total energy. The temperature is derived from the kinetic energy which is contrained by the potential, hence the variables are anti-correlated. We calculate the pressure via the formula,
+\begin{align*}
+  P = \rho k T - \frac{\rho}{6 N}\Sigma r_{ij}F_{ji }.
+\end{align*}
+Using a bin size of 125 for the jackknife of the virial parameter we estimate an error in the pressure of roughly 0.016 for the given initial density and number of particles.
 \begin{figure}[h]
 \centering
   \captionsetup[subfigure]{labelformat=empty}

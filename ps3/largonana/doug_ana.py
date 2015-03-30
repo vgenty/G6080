@@ -2,7 +2,7 @@ import ROOT
 from ROOT import TCanvas, TLatex, TH1D, TGraph, TH2D, TLegend, TPaveText
 from ROOT import TTree, TFile, gStyle
 from looks import *
-
+h = 1
 ROOT.gSystem.Load('libLArgon')
 from ROOT import LArgon
 
@@ -23,6 +23,8 @@ T  = n.array(b.T())
 VI = n.array(b.P())
 
 varrs = [PE,T,VI]
+j = 0
+#Negative covariance - variable is inversely related!!!!!
 
 means = [n.mean(varrs[i]) for i in xrange(len(varrs))]
 names = ["Pot Energy","Temp","Virial"]
@@ -114,3 +116,54 @@ cc.Modified()
 
 
 #Negative covariance - variable is inversely related!!!!!
+
+
+#Jackknife of Liquid argon virial theorem
+
+if( j == h):
+    for f in xrange(0,1):
+
+    #for b in xrange(2,1000) :
+        vprime = []
+        before = 0
+
+        for b in xrange(80,81): #bin size = 125??
+            
+            pp = []
+            zz = 0.0
+            Ndivb = int(n.floor(float(howmany)/b))
+        
+            if Ndivb == before:
+                continue
+    
+            before = Ndivb
+            bb = 0.0
+    
+            #Do averaging inside each of the bins
+        
+            #Bin data
+        
+            binss = rebin(b,datasamples[f][0])
+            bins = binss[0]
+                    
+            for k in xrange(len(bins)): #b is the number of jackknife bins
+                zz = 0.0
+                for i in xrange(len(bins)):
+                    if i != k: #never ever use is not to compare numbers idiot
+                        zz += bins[i]
+
+                    vkp = zz/(len(bins)-1.0)
+                    pp.append(vkp)
+        
+                vprime.append([pp,binss[1]])
+                
+        gg.append(vprime)
+
+
+
+    delP = rho * k * T - rho/(6*N)*vir
+
+    print "Jackkknife of pressure"
+    print delP
+
+raw_input('')
