@@ -7,4 +7,7 @@ executable
 *.pyc
 *.pdf
 .DS_STORE
-
+*.aux
+*.bib
+*.log
+*.root
