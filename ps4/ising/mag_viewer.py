@@ -1,4 +1,4 @@
-#/usr/bin/python -i
+#!/usr/bin/python -i
 
 from ROOT import TCanvas, TGraph
 
@@ -16,7 +16,7 @@ c1 = TCanvas()
 try:
     sys.argv[1]
 except IndexError:
-    print "./playboy.py [filename]"
+    print "./mag_viewer.py [filename]"
     sys.exit()
 else:
     datfile = sys.argv[1]

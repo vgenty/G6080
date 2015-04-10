@@ -20,8 +20,11 @@ y = 0
 N = 256
 
 th2.GetZaxis().SetRangeUser(-1,1)
+th2.GetZaxis().SetNdivisions(2)
+
 th2.GetXaxis().SetTitle("Sx")
 th2.GetYaxis().SetTitle("Sy")
+
 th2.GetXaxis().CenterTitle()
 th2.GetYaxis().CenterTitle()
 
@@ -34,7 +37,7 @@ for line in file:
         
     c1.Update()
     c1.Modified()
-    time.sleep(0.1)
+    time.sleep(0.01)
     x = 0
     y = 0
     
