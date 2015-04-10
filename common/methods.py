@@ -4,7 +4,7 @@ def tgs(tgraphs,title) :
 
     tmg = TMultiGraph()
     tle = TLegend(0.6,0.4,0.9,0.8)
-    tit = TPaveText(0.30,0.91,0.70,1,"nbNDC")
+    tit = TPaveText(0.2988506,0.934322,0.6997126,1,"nbNDC")
 
     # Make Title:
     tit.SetFillColor(0)
@@ -20,5 +20,5 @@ def tgs(tgraphs,title) :
         tle.AddEntry(tgraphs[i],tgraphs[i].GetName(),"l")
 
     
-    tmg.SetDrawStyle("AL")
+    #tmg.SetDrawStyle("AL")
     return [tmg,tle,tit]

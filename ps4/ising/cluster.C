@@ -22,7 +22,7 @@ double T, B, p;
 //const double p = 0.36;
 //const double p = 0.46;
 
-const int nsteps = 8000;
+int nsteps;
 //const int nsteps = 20000;
 
 extern void rand3_reset(int idum);
@@ -44,9 +44,6 @@ int main( int argc, char ** argv ) {
   double mag;
   FILE * fp;
   FILE * fpm;
-
-  fp = fopen("cluster.dat", "w" );
-  fpm = fopen("cluster_magnitude.dat", "w" );
 
   // Initialize random number stream
 
@@ -72,8 +69,34 @@ int main( int argc, char ** argv ) {
 
   // Initialize T, B, p
   // Tc ~= 2.2619
-  T = 3.25;
-  B = 0.002;
+
+  if(argc != 4) { 
+    printf("\n\tNeed two arguments\n");
+    printf("\t./cluster [T] [B] [Nsteps]\n\n");
+    exit(1);
+  }
+  
+  T      = atof(argv[1]);
+  B      = atof(argv[2]);
+  nsteps = atoi(argv[3]);
+
+  // Output files
+  char *cdat  = (char*)malloc(sizeof(char)*100);
+  char *cmdat = (char*)malloc(sizeof(char)*100);
+
+  sprintf(cdat ,"cdat_%f_%f.dat" ,T,B);
+  sprintf(cmdat,"cmdat_%f_%f.dat",T,B);
+
+  const char* const_cdat  = cdat;
+  const char* const_cmdat = cmdat;
+
+  fp  = fopen(const_cdat,  "w" );
+  fpm = fopen(const_cmdat, "w" );
+
+  
+  // T = 3.25;
+  // B = 0.002;
+  
   p = 1.0 - exp(-2.0*J/T);
 
   double cmag  = 0.0;

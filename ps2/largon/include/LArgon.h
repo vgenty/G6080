@@ -50,8 +50,21 @@ class LArgon : public TObject { // I guess we will derive from
   std::vector<double> _Ttot;
   std::vector<double> _Ptot;
 
+
+  double _PEnow = 0.0;
+  double _PEaft = 0.0;
+
+  double _KEnow = 0.0;
+  double _KEaft = 0.0;
+
+  double _Tnow = 0.0;
+  double _Taft = 0.0;
+
+  
   //Simulation directors
-  void _routine();
+  void _routine ();
+  void _routine2();
+  
   void _restart();
   void _from_file(int more_steps);
   
@@ -73,8 +86,7 @@ class LArgon : public TObject { // I guess we will derive from
   boost::mt19937 _rng;
   
   void _scale_velocities(const int& i, const double& T);
-  
-  
+    
   void _resize_all(const int& ns,const int& np); //For new run/continue
   
  public:
@@ -104,6 +116,7 @@ class LArgon : public TObject { // I guess we will derive from
   // Public evolve
   void evolve();
   void evolve(int i);
+  void monte();
   
   //Getters
   std::vector<double> KE() const; // KE

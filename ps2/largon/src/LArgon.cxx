@@ -11,6 +11,101 @@ void LArgon::evolve(int i) {
   _routine();
 }
 
+void LArgon::monte() {
+  _restart();
+  _routine2();  
+}
+
+void LArgon::_routine2() {
+
+  for(auto i : boost::irange(_start,_nsteps-1)) { // How many steps
+
+    std::cout << "Step " << i << "\n";
+    // We need to loop over each of the particles, propose a r and v step
+
+    //Assume nothing happened and make a copy of i into i+1
+    
+    for(auto j : boost::irange(0,_nparticles)) {
+      for(int k = 0; k < 3; ++k) {
+	_r[i+1][j][k] = _r[i][j][k];
+	_v[i+1][j][k] = _v[i][j][k];
+      }
+    }
+
+
+    // Now lets get down to brass tax
+    for(auto j : boost::irange(0,_nparticles)) {
+
+      // Proposed moves
+
+      _PEnow = _PEtot[i];
+      _KEnow = _KEtot[i];
+      _Tnow  = _Ttot[i];
+      
+      for(int k = 0; k < 3; ++k) {
+	_r[i+1][j][k] += _get_ran_double(-0.2,0.2);
+	_v[i+1][j][k] += _get_ran_double(-1.5,1.5);
+	
+	// periodic boundary conditions
+      	if(_r[i+1][j][k] >= _L)
+	  _r[i+1][j][k] = fmod(_r[i+1][j][k],_L);
+	
+	if( _r[i+1][j][k] < 0 )
+	  _r[i+1][j][k] = _L - fmod(fabs(_r[i+1][j][k]),_L);
+      }
+      
+      // Recalculate the total energies
+      _T(i+1);
+      _K(i+1);
+      _F(i+1);
+      
+      
+      _PEaft = _PEtot[i+1];
+      _KEaft = _KEtot[i+1];
+      _Taft  = _Ttot[i+1];
+
+      auto Enow_ = _KEnow + _PEnow;
+      auto Eaft_ = _KEaft + _PEaft;
+      
+      if(Eaft_ < Enow_){ // Energy lower, accept
+	
+	// i.e do nothing
+	
+      } else { // Energy was higher...
+      
+	auto p = exp(-1.0*( Eaft_ - Enow_ ) / _Tnow);
+
+	std::cout << p << "\n";
+	
+	auto z = _get_ran_double(0.0,1.0);
+	
+	if ( z < p ) { // We got lucky, accept
+	  
+	  // i.e. do nothing
+	  
+	} else { // Nope reject
+
+	  _PEtot[i+1] = _PEnow;
+	  _KEtot[i+1] = _KEnow;
+	  _Ttot[i+1]  = _Tnow;
+
+	  //Reset the positions and velocities for this particle
+	  for(int k = 0; k < 3; ++k) {
+	    _r[i+1][j][k] = _r[i][j][k];
+	    _v[i+1][j][k] = _v[i][j][k];
+	  }
+
+	} // end reject
+	
+      } // end Energy was higher
+      
+    } // end current particle
+
+  }// next "step"
+
+  std::cout << "Finished monte : - ) \n";
+}
+
 void LArgon::_routine() {
   
   for(auto i : boost::irange(_start,_nsteps-1)) {
@@ -54,8 +149,6 @@ void LArgon::_routine() {
   std::cout << "Finished\n";
   
 }
-
-
 
 void LArgon::_restart() {
   
@@ -186,13 +279,16 @@ void LArgon::_F(const int& i) {
 	}
       
 	pe_  += 4*(0.5)*(1/pow(de_,6) - 1/pow(de_,3));
-	p_   += (48)*(1/pow(de_,6) - 0.5*1/pow(de_,3)); 
+	//p_   += (48)*(1/pow(de_,6) - 0.5*1/pow(de_,3)); 
 	
-      	for(int b = 0; b < 3; ++b)
-	  _f[i][j][b] += 48 * (_r[i][j][b] - img_[b])*(1/pow(de_,7) - 0.5*1/pow(de_,4));
+	for(int b = 0; b < 3; ++b) {
+	  _f[i][j][b] = 0.0;
+	  //_f[i][j][b] += 48 * (_r[i][j][b] - img_[b])*(1/pow(de_,7) - 0.5*1/pow(de_,4));
+	}
       }
     } 
   }  
+  
   _Ptot[i]  = p_;
   _PEtot[i] = pe_;
 }

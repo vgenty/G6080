@@ -4,6 +4,5 @@
 #pragma link off all functions;
 
 #pragma link C++ class LArgon+;
-#pragma link C++ class LArgon(int, int, double, double, double)+;
    
 #endif

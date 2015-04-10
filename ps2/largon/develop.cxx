@@ -40,10 +40,14 @@ int main(int argc, char *argv[]) {
     
     the_tree->Branch("LArgon",&b);
     
-    b.evolve();
-    
+    //b.evolve();
+    b.monte();
+
+    std::cout << "Filling TTree\n";
     the_tree->Fill();
+    std::cout << "Writing TTree\n";
     the_tree->Write();
+    std::cout << "Closing TFile\n";
     the_file->Close();
     std::exit(0);
   
