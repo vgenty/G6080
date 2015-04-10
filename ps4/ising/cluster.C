@@ -44,7 +44,8 @@ int main( int argc, char ** argv ) {
   double mag;
   FILE * fp;
   FILE * fpm;
-
+  FILE * spn;
+  
   // Initialize random number stream
 
   rand3_reset(1234);
@@ -93,6 +94,7 @@ int main( int argc, char ** argv ) {
   fp  = fopen(const_cdat,  "w" );
   fpm = fopen(const_cmdat, "w" );
 
+  spn = fopen("the_spins.dat","w");
   
   // T = 3.25;
   // B = 0.002;
@@ -137,12 +139,20 @@ int main( int argc, char ** argv ) {
     memset(cluster, 0, sizeof(cluster));
     
     mag = 0.0;
-    for ( i = 0; i < N2; i++ ) mag += spin[i];
+
+    for ( i = 0; i < N2; i++ ) {
+      mag += spin[i];
+      fprintf( spn, "%d ", spin[i] );
+    }
+    
     if ( n < 100) printf("Magnetization for step %d: %f\n", n, mag/N2 );
     //fprintf( fp, "%d\t%f\n", n, mag/N2 );
     fprintf( fp, "%f\n", mag/N2 );
-    fprintf( fpm, "%d\t%f\n", n, fabs( mag/N2 ) );
+    fprintf( fpm, "%f\n", fabs( mag/N2 ) );
 
+    // Print out the god damn spins
+    
+    fprintf(spn,"\n");
   }
 }
 

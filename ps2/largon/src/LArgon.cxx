@@ -27,8 +27,8 @@ void LArgon::_routine2() {
     
     for(auto j : boost::irange(0,_nparticles)) {
       for(int k = 0; k < 3; ++k) {
-	_r[i+1][j][k] = _r[i][j][k];
-	_v[i+1][j][k] = _v[i][j][k];
+  	_r[i+1][j][k] = _r[i][j][k];
+  	_v[i+1][j][k] = _v[i][j][k];
       }
     }
 
@@ -38,20 +38,20 @@ void LArgon::_routine2() {
 
       // Proposed moves
 
-      _PEnow = _PEtot[i];
-      _KEnow = _KEtot[i];
-      _Tnow  = _Ttot[i];
+      auto _PEnow = _PEtot[i];
+      auto _KEnow = _KEtot[i];
+      auto _Tnow  = _Ttot[i];
       
       for(int k = 0; k < 3; ++k) {
-	_r[i+1][j][k] += _get_ran_double(-0.2,0.2);
-	_v[i+1][j][k] += _get_ran_double(-1.5,1.5);
+  	_r[i+1][j][k] += _get_ran_double(-0.2,0.2);
+  	_v[i+1][j][k] += _get_ran_double(-1.5,1.5);
 	
-	// periodic boundary conditions
+  	// periodic boundary conditions
       	if(_r[i+1][j][k] >= _L)
-	  _r[i+1][j][k] = fmod(_r[i+1][j][k],_L);
+  	  _r[i+1][j][k] = fmod(_r[i+1][j][k],_L);
 	
-	if( _r[i+1][j][k] < 0 )
-	  _r[i+1][j][k] = _L - fmod(fabs(_r[i+1][j][k]),_L);
+  	if( _r[i+1][j][k] < 0 )
+  	  _r[i+1][j][k] = _L - fmod(fabs(_r[i+1][j][k]),_L);
       }
       
       // Recalculate the total energies
@@ -60,49 +60,49 @@ void LArgon::_routine2() {
       _F(i+1);
       
       
-      _PEaft = _PEtot[i+1];
-      _KEaft = _KEtot[i+1];
-      _Taft  = _Ttot[i+1];
+      auto _PEaft = _PEtot[i+1];
+      auto _KEaft = _KEtot[i+1];
+      auto _Taft  = _Ttot[i+1];
 
       auto Enow_ = _KEnow + _PEnow;
       auto Eaft_ = _KEaft + _PEaft;
       
       if(Eaft_ < Enow_){ // Energy lower, accept
 	
-	// i.e do nothing
+  	// i.e do nothing
 	
       } else { // Energy was higher...
       
-	auto p = exp(-1.0*( Eaft_ - Enow_ ) / _Tnow);
+  	auto p = exp(-1.0*( Eaft_ - Enow_ ) / _Tnow); // should this be Tnow??
 
-	std::cout << p << "\n";
+  	//std::cout << p << "\n";
 	
-	auto z = _get_ran_double(0.0,1.0);
+  	auto z = _get_ran_double(0.0,1.0);
 	
-	if ( z < p ) { // We got lucky, accept
+  	if ( z < p ) { // We got lucky, accept
 	  
-	  // i.e. do nothing
+  	  // i.e. do nothing
 	  
-	} else { // Nope reject
+  	} else { // Nope reject
 
-	  _PEtot[i+1] = _PEnow;
-	  _KEtot[i+1] = _KEnow;
-	  _Ttot[i+1]  = _Tnow;
+  	  _PEtot[i+1] = _PEnow;
+  	  _KEtot[i+1] = _KEnow;
+  	  _Ttot[i+1]  = _Tnow;
 
-	  //Reset the positions and velocities for this particle
-	  for(int k = 0; k < 3; ++k) {
-	    _r[i+1][j][k] = _r[i][j][k];
-	    _v[i+1][j][k] = _v[i][j][k];
-	  }
+  	  //Reset the positions and velocities for this particle
+  	  for(int k = 0; k < 3; ++k) {
+  	    _r[i+1][j][k] = _r[i][j][k];
+  	    _v[i+1][j][k] = _v[i][j][k];
+  	  }
 
-	} // end reject
+  	} // end reject
 	
       } // end Energy was higher
       
     } // end current particle
 
   }// next "step"
-
+  
   std::cout << "Finished monte : - ) \n";
 }
 

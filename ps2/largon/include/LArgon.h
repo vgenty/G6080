@@ -51,19 +51,20 @@ class LArgon : public TObject { // I guess we will derive from
   std::vector<double> _Ptot;
 
 
-  double _PEnow = 0.0;
-  double _PEaft = 0.0;
+  // double _PEnow = 0.0;
+  // double _PEaft = 0.0;
 
-  double _KEnow = 0.0;
-  double _KEaft = 0.0;
+  // double _KEnow = 0.0;
+  // double _KEaft = 0.0;
 
-  double _Tnow = 0.0;
-  double _Taft = 0.0;
+  // double _Tnow = 0.0;
+  // double _Taft = 0.0;
 
   
   //Simulation directors
   void _routine ();
   void _routine2();
+  void _routine3();
   
   void _restart();
   void _from_file(int more_steps);

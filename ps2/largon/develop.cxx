@@ -38,13 +38,18 @@ int main(int argc, char *argv[]) {
 	     vm["restart"].as<std::vector<double> >()[3],
 	     vm["restart"].as<std::vector<double> >()[4]);
     
+
     the_tree->Branch("LArgon",&b);
+
+
+    b.monte();
+	
     
     //b.evolve();
-    b.monte();
 
     std::cout << "Filling TTree\n";
     the_tree->Fill();
+    fflush(stdout);
     std::cout << "Writing TTree\n";
     the_tree->Write();
     std::cout << "Closing TFile\n";

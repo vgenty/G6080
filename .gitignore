@@ -11,3 +11,4 @@ executable
 *.bib
 *.log
 *.root
+*.dat
