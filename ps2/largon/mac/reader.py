@@ -161,6 +161,13 @@ def main():
         tt = TT(b)
         tt.Draw("AL")
 
+    if(args[0] == "pressure"):
+        
+        c1 = TCanvas();
+        c1.cd()
+        tt = PP(b)
+        tt.Draw("AL")
+
     # c8 = TCanvas()
     # c8.cd()
     # p = P(b)
@@ -311,6 +318,20 @@ def TT(b):
     tgT.SetLineWidth(2)
     
     return tgT
+
+def PP(b):
+    tgP = TGraph()
+    
+    for i in xrange(len(b.T())):
+        tgP.SetPoint(i,i,1-1/(6 * b.N() * b.T()[i])*b.P()[i])
+
+    tgP.GetYaxis().SetTitle("Pressure")
+    tgP.GetXaxis().SetTitle("Time")
+    tgP.GetXaxis().CenterTitle()
+    tgP.GetYaxis().CenterTitle()
+    tgP.SetLineWidth(2)
+    
+    return tgP
 
 if __name__ == '__main__' :
     main()

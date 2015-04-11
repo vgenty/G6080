@@ -70,6 +70,7 @@ class LArgon : public TObject { // I guess we will derive from
   void _from_file(int more_steps);
   
   void _F(const int& i);
+  double _F2(const int& i,const int& j);
   void _K(const int& i);
   void _T(const int& i);
   
@@ -124,7 +125,8 @@ class LArgon : public TObject { // I guess we will derive from
   std::vector<double> PE() const; // PE
   std::vector<double> T()  const; // T
   std::vector<double> P()  const; // P (Virial...)
-
+  double N() const;
+  
   std::vector<std::vector<std::array<double, 3> > > R() const;
   std::vector<std::vector<std::array<double, 3> > > V() const;
   
@@ -134,6 +136,8 @@ inline std::vector<double> LArgon::KE() const { return _KEtot; }
 inline std::vector<double> LArgon::PE() const { return _PEtot; }
 inline std::vector<double> LArgon::T()  const { return _Ttot; }
 inline std::vector<double> LArgon::P()  const { return _Ptot; }
+
+inline double LArgon::N() const { return _nparticles; }
 
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::R() const { return _r; }
 inline std::vector<std::vector<std::array<double, 3> > > LArgon::V() const { return _v; }
