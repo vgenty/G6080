@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall
+CFLAGS= -O3 -Wall
 LDFLAGS=-lm
 EXECUTABLE=cluster
 

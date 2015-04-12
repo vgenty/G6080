@@ -8,10 +8,10 @@ from ROOT import TCanvas, TGraph
 from looks import *
 from methods import *
 
-temps = np.linspace(0,5.0,1000,endpoint=False)
+temps = np.linspace(0,5.0,100,endpoint=False)
 
 for t in temps:
-    sp.call(["./cluster",str(t),"0.0", "2000"])
+    sp.call(["./cluster",str(t),"0.00", "5000"])
 
 
 dats = [ j for j in os.listdir(".") if j.startswith("cmdat") and j.endswith(".dat")]
@@ -29,7 +29,7 @@ mags = []
 for f in files:
     for l in f:
         n += 1
-        if( n >= 1900):
+        if( n >= 4900):
             z += 1
             l.strip()
             avg += float(l)
@@ -46,6 +46,7 @@ for x in xrange(len(mags)):
     tg.SetPoint(x,temps[x],mags[x])
 
 
-tg.Draw("AL")
+tg.SetMarkerStyle(6)
+tg.Draw("AP")
 c1.Update()
 c1.Modified()

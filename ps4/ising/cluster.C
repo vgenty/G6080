@@ -117,7 +117,6 @@ int main( int argc, char ** argv ) {
     for ( int k = 0 ; k < count; ++k) {
       spin[cluster[k]] *= -1;
       cmag += spin[cluster[k]];
-      //printf("cluster[%d] = %d ~ spin[%d] = %d \n",k,cluster[k],cluster[k],spin[cluster[k]]);
     }
     
     //Try and flip the cluster based on the field.
@@ -125,7 +124,7 @@ int main( int argc, char ** argv ) {
     bprob = B * cmag;
     
     if( bprob <= 0 )
-      bprob = 1;
+      bprob = 1.0; // Always ensure success
     else
       bprob = exp(-B * cmag);
     
@@ -145,13 +144,10 @@ int main( int argc, char ** argv ) {
       fprintf( spn, "%d ", spin[i] );
     }
     
-    //if ( n < 100) printf("Magnetization for step %d: %f\n", n, mag/N2 );
-    //fprintf( fp, "%d\t%f\n", n, mag/N2 );
     fprintf( fp, "%f\n", mag/N2 );
     fprintf( fpm, "%f\n", fabs( mag/N2 ) );
 
-    // Print out the god damn spins
-    
+    // Print out the god damn spins    
     fprintf(spn,"\n");
   }
 }
