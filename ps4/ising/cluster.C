@@ -50,9 +50,9 @@ int main( int argc, char ** argv ) {
 
   rand3_reset(1234);
 
-  for ( n = 0; n < 20; n++ ) {
-    printf("%d %f\n", n, rand3() );
-  }
+  // for ( n = 0; n < 20; n++ ) {
+  //   printf("%d %f\n", n, rand3() );
+  // }
 
   // Initialize spins
 
@@ -63,7 +63,7 @@ int main( int argc, char ** argv ) {
     mag += spin[i];
   }
 
-  printf("Magnetization for step 0 %f\n", mag/N2 );
+  //printf("Magnetization for step 0 %f\n", mag/N2 );
   
   //Initialize clusters
   memset(cluster, 0, sizeof(cluster));
@@ -111,7 +111,7 @@ int main( int argc, char ** argv ) {
 
     flip( i, spin[i] );
 
-    printf("\n\nSTEP %d\n",n);
+    //printf("\n\nSTEP %d\n",n);
     
     // Flip them back? find cluster mag
     for ( int k = 0 ; k < count; ++k) {
@@ -145,7 +145,7 @@ int main( int argc, char ** argv ) {
       fprintf( spn, "%d ", spin[i] );
     }
     
-    if ( n < 100) printf("Magnetization for step %d: %f\n", n, mag/N2 );
+    //if ( n < 100) printf("Magnetization for step %d: %f\n", n, mag/N2 );
     //fprintf( fp, "%d\t%f\n", n, mag/N2 );
     fprintf( fp, "%f\n", mag/N2 );
     fprintf( fpm, "%f\n", fabs( mag/N2 ) );

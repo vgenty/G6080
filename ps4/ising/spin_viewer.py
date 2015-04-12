@@ -1,3 +1,5 @@
+#!/usr/bin/python -i
+
 from ROOT import TCanvas, TH2D
 
 from looks import *
