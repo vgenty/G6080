@@ -25,10 +25,17 @@
 \date{\today}
 \begin{abstract}
 \centering
-Source code can be found at \href{https://github.com/vgenty/G6080/tree/master/ps3}{github.com/vgenty/G6080/ps4}
+Source code can be found at \href{https://github.com/vgenty/G6080/tree/master/ps4}{github.com/vgenty/G6080/ps4}
 \end{abstract}
 \maketitle
 \section{Problem 1 - Monte Carlo}
-The monte carlo algorithm is implemented in the previous liquid argon code with a few minor adjustments. I created a new method \verb|void LArgon::monte()| which contains the metropolis procedure.
+A monte carlo algorithm is implemented in the previous liquid argon code with a few minor adjustments. I created a new method \verb|void LArgon::monte()| which contains the metropolis procedure. The liquid argon code can be switched back and forth between the microcanonical ensemble (constant particle number $N$, volume $V$, and energy $E$) evolved via lennard jones force and the canonical ensemble (constant $N$, $V$, and temperature $T$) evolved via monte carlo. To switch between the two, please edit the line in \verb|develop.cxx| from \verb|b.evolve()| to \verb|b.monte()|. The program output stream will be identical. In the metropolis scheme every ``step'' each particle's position is randomly displaced in a uniform box of side length $\pm 0.1\sigma$ using the function \verb|double LArgon::_get_ran_double(double min, double max)| which returns a random number on the interval min to max. As mentioned in the second problem set the $boost::mt19937$ generator is used. The particle's previous state is stored in $i-1$. The particles are selected in order, given a proposed new position, then the total change in potential energy is is computed. If the total change in potential energy is less, the step is accepted. If the energy is higher, the boltzman weight is computed,
+\eq{
+  p = e^{-(\Delta\text{E})/T},
+}
+for $T$ the fixed energy of the heat bath (a program input parameter). A double precision number $z$ is chosen between 0 and 1. If $z < p$ the move is accepted, if not the particle is placed back in it's initial state.
+
+\section{Problem 2 - Wolff Ising with Metropolis}
+I modified \verb|custer.C| to include presence on non-zero magnetic field. Each step, a cluster is identified by Wolff recursion and stored in \verb|int cluster[N*N]|. The total cluster magnetization $M_c$ is computed. If $B\cdot M_c <= 0$ the cluster is flipped 100\% of the time as is it energetically favorable. If positive, the boltzman weight is computed and a random number chosen. If the random number is less than the boltzman weight the spin is flipped in the direction of the field. The weaker the magnetic field the more likely spins of opposite orientation are flipped. The spin state is outputted into a data file \verb|the_spins.dat| as well as the absolute magnetization as a function of step. The program has also been modified to access three input prameters: temperature, magnetic field, and number of steps. The number of spins is hard coded. 
 
 \end{document}

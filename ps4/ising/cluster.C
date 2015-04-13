@@ -1,7 +1,7 @@
 //
 //  Wolff single-cluster flip code following
 //  http://web.cz3.nus.edu.sg/~yzchen/teach/comphys/sec13.html
-
+//  (website defunct)
 
 //  Modified by Victor Genty
 //  vgenty@nevis.columbia.edu
