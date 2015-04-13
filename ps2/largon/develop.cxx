@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   po::store(po::parse_command_line(argc,argv,desc),vm);
   po::notify(vm);
   
-  if ( vm.count("help") ) {
+  if ( vm.count("help") || argc == 1) {
     std::cout << desc << std::endl;
     return 0;
   }
@@ -41,24 +41,21 @@ int main(int argc, char *argv[]) {
 
     the_tree->Branch("LArgon",&b);
     
-    
+
     b.monte();
-    
     
     //b.evolve();
 
-    std::cout << "Filling TTree\n";
     the_tree->Fill();
-    fflush(stdout);
-    std::cout << "Writing TTree\n";
     the_tree->Write();
-    std::cout << "Closing TFile\n";
     the_file->Close();
+
+    //Explicit exit ensures ROOT doesn't hang the program.
     std::exit(0);
   
   }
   
-  else if (vm.count("continue")) {
+  else if (vm.count("continue")) { // Not supported for monte carlo
     
     LArgon *b = new LArgon();
     

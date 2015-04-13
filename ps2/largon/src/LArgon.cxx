@@ -20,7 +20,6 @@ void LArgon::_routine2() {
 
   //Get the PE started
 
-  
   for(auto i : boost::irange(_start,_nsteps-1)) { // How many steps
     
     std::cout << "Step " << i << "\n";
@@ -35,70 +34,48 @@ void LArgon::_routine2() {
       }
     }
     
-
+    //_PEtot[i+1] = _PEtot[i];
     _F(i+1);
+    std::cout << _PEtot[i+1] << std::endl;
     _T(i+1);
     _K(i+1);
-             
+    
     // Now lets get down to brass tax
     for(auto j : boost::irange(0,_nparticles)) {
       
       //Store initial energy and temp
-      auto _PEnow = _PEtot[i+1];
-      //auto _KEnow = _KEtot[i+1];
-      //auto _Tnow  = _Ttot[i+1];
+            
+      auto _PEnow = _F2(i+1,j);
       
-      // std::cout << "_PEnow " << _PEnow << "\n";
-      // std::cout << "_KEnow " << _KEnow << "\n";
       
       // Proposed moves
       for(int k = 0; k < 3; ++k) {
   	_r[i+1][j][k] += _get_ran_double(-0.1,0.1);
+	//_r[i+1][j][k] += 0.0;
 
-
-	// Do I even have to do velocity? Canonical ensemble constant T?
-	
-	//_v[i+1][j][k] += (_r[i+1][j][k] - _r[i][j][k]) / _t;			    //_v[i+1][j][k] += _get_ran_double(-0.1,0.1);
-	
   	// periodic boundary conditions
       	if(_r[i+1][j][k] >= _L)
   	  _r[i+1][j][k] = fmod(_r[i+1][j][k],_L);
 	
   	if( _r[i+1][j][k] < 0 )
   	  _r[i+1][j][k] = _L - fmod(fabs(_r[i+1][j][k]),_L);
-
+	
       }
 
+      auto _PEaft  = _F2(i+1,j);
       
+      auto deltaPE = _PEaft - _PEnow;
+      _PEtot[i+1] += deltaPE;
       
-      // Recalculate the total kinetic and potential values in i+1
-      //_T(i+1);
-      //_K(i+1);
-      auto deltaPE = _F2(i+1,j);
-      
-      //auto _KEaft  = _KEtot[i+1];
-      //auto _Taft   = _Ttot[i+1];
-
-      //std::cout << "kdiff " << _KEaft - _KEnow << "\n";
-      
-      auto _PEaft = _PEnow + deltaPE;
-      _PEtot[i+1] = _PEaft;
-      
-      //auto Enow_ = _KEnow + _PEnow;
-      //auto Eaft_ = _KEaft + _PEaft;
-
-      auto Enow_ = _PEnow;
-      auto Eaft_ = _PEaft;
-      
-      if(Eaft_ < Enow_){ // Energy lower, accept
+      if(deltaPE < 0){ // Energy lower, accept
 	
 	//std::cout << "Accepted particle j = " << j << " (energy lower)\n";
   	// i.e do nothing
 	
       } else { // Energy was higher...
-      
-  	//auto p = exp(-1.0*( Eaft_ - Enow_ ) / _Tnow); // should this be Tnow??
-	auto p = exp(-1.0*( Eaft_ - Enow_ )); // should this be Tnow??
+	
+  	//auto p = exp(-1.0*( Eaft_ - Enow_ ) / _Tnow); // should this be Tnow?
+	auto p = exp(-1.0*( deltaPE )/_Ttot[i]); // T fixed duh im stupid
 	
   	auto z = _get_ran_double(0.0,1.0);
 		
@@ -113,26 +90,20 @@ void LArgon::_routine2() {
 
 	  //std::cout << "Rejected particle j = " << j << " (not lucky)\n";
 	  
-	  _PEtot[i+1] = _PEnow;
-	  //_KEtot[i+1] = _KEnow;
-  	  //_Ttot[i+1]  = _Tnow;
-	  
+	  _PEtot[i+1] -= deltaPE;
+
   	  //Reset the positions and velocities for this particle
-  	  for(int k = 0; k < 3; ++k) {
+  	  for(int k = 0; k < 3; ++k) 
   	    _r[i+1][j][k] = _r[i][j][k];
-  	    _v[i+1][j][k] = _v[i][j][k];
-  	  }
+  	    
+  	  
 
   	} // end reject
 	
       } // end Energy was higher
       
     } // end current particle
-    
-    // _PEtot[i+1] = _PEtot[i];
-    // _Ktot[i+1]  = _Ktot[i];
-    // _Ttot[i+1]  = _Ttot[i];
-    
+    std::cout << _PEtot[i+1] << std::endl;
   }// next "step"
   
   std::cout << "Finished monte : - ) \n";
@@ -328,7 +299,6 @@ void LArgon::_F(const int& i) {
 double LArgon::_F2(const int& i,const int &j) {
   
   double pe_ = 0.0;
-  //p_  = 0.0;
   
 #pragma omp parallel for collapse(1) reduction(+:pe_)
   for(int l = 0 ; l  < _nparticles; ++l){ // for each particle
@@ -349,7 +319,6 @@ double LArgon::_F2(const int& i,const int &j) {
       
       for(int b = 0; b < 3; ++b) 
 	_f[i][j][b] = 0.0;      
-      
     }
   } 
   
