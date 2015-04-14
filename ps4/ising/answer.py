@@ -8,7 +8,7 @@ from ROOT import TCanvas, TGraph
 from looks import *
 from methods import *
 
-temps = np.linspace(0,5.0,100,endpoint=False)
+temps = np.linspace(0,5.0,1000,endpoint=False)
 
 for t in temps:
     sp.call(["./cluster",str(t),"0.00", "5000"])

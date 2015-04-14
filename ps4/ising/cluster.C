@@ -12,7 +12,7 @@
 #include <string.h> // for memset
 //#include <cmath>    // for exp
 
-const int N = 16;
+const int N = 50;
 const int N2 = N*N;
 const int NEIGH = 4;
 
@@ -23,7 +23,7 @@ double T, B, p;
 //const double p = 0.46;
 
 int nsteps;
-//const int nsteps = 20000;
+//const int nsteps = 2000
 
 extern void rand3_reset(int idum);
 extern float rand3(void);

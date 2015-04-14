@@ -4,7 +4,7 @@ import subprocess32 as sp
 import numpy as np
 import os, sys
 import ROOT
-from ROOT import TCanvas, TGraph, gStyle
+from ROOT import TCanvas, TGraph, gStyle, TF1
 from looks import *
 from methods import *
 
@@ -16,7 +16,7 @@ file = open("the_spins.dat")
 x=0
 y = 0
 
-N=16
+N=50
 NN = N*N
 
 ss = []
@@ -55,7 +55,7 @@ for n in xrange(0,9):
                       s[x][y]*s[x][r] )
                   
             
-        fs.append(f/(4*NN))
+        fs.append(f/NN)
         f = 0.0
     #Average the final 100 values?
     avgs.append(np.mean(fs[len(fs)-100:len(fs)]))
@@ -68,8 +68,10 @@ for i in xrange(len(avgs)) :
     tg.SetPoint(i,i,avgs[i])
 
 
+
+tf = TF1("tf","[0]*exp([1]*x)+[2]",0,10)
 tg.SetMarkerStyle(6)
-tg.Fit("expo")
+tg.Fit("tf")
 gStyle.SetOptFit(1111)
 tg.Draw("AL")
 
