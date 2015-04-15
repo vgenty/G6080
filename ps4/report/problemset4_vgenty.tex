@@ -29,7 +29,7 @@ Source code can be found at \href{https://github.com/vgenty/G6080/tree/master/ps
 \maketitle
 \section{Problem 1 - Monte Carlo}
 \begin{center}{\it Code for this problem can be found mainly in \verb|ps2/largon/mac/doug_ana.py|, \verb|jackknife.py|, and the monte-carlo implementation in \verb|ps2/largon/src/LArgon.cxx|}\end{center}\\\hspace{1pt}\\
-\indent A monte carlo algorithm is implemented in the previous liquid argon code with a few minor adjustments. I created a new method \verb|void LArgon::monte()| which contains the metropolis procedure. The liquid argon code can be switched back and forth between the microcanonical ensemble (constant particle number $N$, volume $V$, and energy $E$) evolved via lennard jones force and the canonical ensemble (constant $N$, $V$, and temperature $T$) evolved via monte carlo. To switch between the two, please edit the line in \verb|develop.cxx| from \verb|b.evolve()| to \verb|b.monte()|. The program output stream will be identical. In the metropolis scheme every ``step'' each particle's position is randomly displaced in a uniform box of side length $\pm 0.1\sigma$ using the function \verb|double LArgon::_get_ran_double(double min, double max)| which returns a random number on the interval min to max. As mentioned in the second problem set the $boost::mt19937$ generator is used. The particle's previous state is stored in $i-1$. The particles are selected in order, given a proposed new position, then the total change in potential energy is is computed. If the total change in potential energy is less, the step is accepted. If the energy is higher, the boltzman weight is computed,
+\indent A monte carlo algorithm is implemented in the previous liquid argon code with a few minor adjustments. I created a new method \verb|void LArgon::monte()| which contains the metropolis procedure. The liquid argon code can be switched back and forth between the microcanonical ensemble (constant particle number $N$, volume $V$, and energy $E$) evolved via lennard jones force and the canonical ensemble (constant $N$, $V$, and temperature $T$) evolved via monte carlo. To switch between the two, please edit the line in \verb|develop.cxx| from \verb|b.evolve()| to \verb|b.monte()|. The program output stream will be identical. In the metropolis scheme every ``step'' each particle's position is randomly displaced in a uniform box of side length $\pm 0.1\sigma$ using the function \verb|double LArgon::_get_ran_double(double min, double max)| which returns a random number on the interval min to max. As mentioned in the second problem set the \verb|boost::mt19937| generator is used. The particle's previous state is stored in $i-1$. The particles are selected in order, given a proposed new position, then the total change in potential energy is is computed. If the total change in potential energy is less, the step is accepted. If the energy is higher, the boltzman weight is computed,
 \eq{
   p = e^{-\Delta E/T},
 }
@@ -80,7 +80,7 @@ I modified \verb|custer.C| to include presence on non-zero magnetic field. Each 
 \begin{align*}
   \frac{M}{N} = \left(1-\sinh^{-4}\left(\frac{2}{T}\right)\right)^{1/8},
 \end{align*}
-the data fits the solution beautifullly below the critical temperature $T_c$.
+the data fits the solution beautifully below the critical temperature $T_c$.
 \begin{figure}[h]
   \centering
   \captionsetup[subfigure]{labelformat=empty}
@@ -106,13 +106,37 @@ the data fits the solution beautifullly below the critical temperature $T_c$.
 \end{figure}
 \clearpage
 \section{Problem 3 - Correlation in 2D Ising Model}
+\begin{center}{\it Code for this section can be found in \verb|spin_correlator.py|} and in \verb|cluster.C|\end{center}
 \subsection*{3.1}
+For this section we set $B=0$ and calculate the pairwise two point correlation function,
+\begin{align*}
+  \langle \sigma(x)\sigma(y) \rangle \sim \exp\left(\frac{|x-y|}{a(T)}\right)
+\end{align*}
+For $|x-y|$ integer displacements along the $x$ and $y$ axis and $a(T)$ the time dependent correlation length parameters. They theoretical dependence of $a(T)$ on $T$ is \,
+\begin{align*}
+  a(T) = \frac{1}{|T-T_c|},
+\end{align*}
+i.e. is has a critcal exponent of -1. For this section we calculate $\sigma(x)\sigma(y)$ by computing the parameters in a cross fashion (see loop in script) which calculates the correlation parameters and averages it over the entire lattice, respecting periodic bounary conditions. The only issue I found was with normalization but it doesn't seem so important as it can be ignored by making it a fit parameters. A few spectrums of mean $\sigma(x)\sigma(y)$ are computed for $n=m$ up to 10 as the problem suggests and then fit using the MINUIT fitter. A single fit result is shown in Fig. \ref{example} at $T=2.2$ near the critical temperature phase transition. One can observe the exponential decay law as expected in the mean correlation function as a function of displacement $n$.
 \begin{figure}[h]
   \centering
   \captionsetup[subfigure]{labelformat=empty}
   \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/example_fit_T_22.eps}}
-  \caption{\label{example} Big baby loves d}
+  \caption{\label{example} Example fit to $B=0$, $T=2.2$ correlation function as a function of distance. The result is exponential as expected. The fir parameters are displayed about the fit window. An extra constant p2 helped the fitter converge by displaying the exponential decay upwards relative to the x axis.}
 \end{figure}
 
 
+We then do multiple trials and scan the correlation parameter $a(T)$ over a range of values {\it less than} the critical temperature, plot the 2 point correlator, fit the TGraph with MINUIT, and extract the correlation length. The results are shown in Fig. \ref{power_law}
+
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/power_law.eps}}
+  \caption{\label{power_law} Inverse function increase in the correlation parameter as a function of temperature slightly below the critical temperature in (more or less) agreement with the expected curve. }
+\end{figure}
+
+
+The expected inverse function is found. With this method we find great difficulty in finding $a(T) < 1/8$ as mentioned in the problem. The most salient point is $a\propto |T-T_C|^{-1}$ as predicted by mean field theory and the renormalization procedure.
+
+\subsection*{3.2}
+We implement an improved method to calculate the correlation length parameter outlined in section 3.2. We compare the values which enter the two point correlator measurement before and after a call to the flip() function (or during). We find the the error (or the fluctuations in the measurement) are greatly reduced. With this implementation we are able to barely able to measure value of $a(T)$ below 1/8.
 \end{document}

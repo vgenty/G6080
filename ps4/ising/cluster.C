@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h> // for memset
-//#include <cmath>    // for exp
+//#include <cmath>  // for exp
 
 const int N = 16;
 const int N2 = N*N;
@@ -19,8 +19,12 @@ const int NEIGH = 4;
 const double J = +1; // coupling
 double T, B, p;
 
-//const double p = 0.36;
-//const double p = 0.46;
+// Improved correlator, if the spin is INSIDE the cluster good to go
+// if the next is OUTSIDE the cluster then the correlator
+// is zero
+
+int compare = 0;
+double correlator = 0.0;
 
 int nsteps;
 //const int nsteps = 2000
@@ -45,6 +49,9 @@ int main( int argc, char ** argv ) {
   FILE * fp;
   FILE * fpm;
   FILE * spn;
+
+  //Correlator dat file
+  FILE * cor;
   
   // Initialize random number stream
 
@@ -95,6 +102,7 @@ int main( int argc, char ** argv ) {
   fpm = fopen(const_cmdat, "w" );
 
   spn = fopen("the_spins.dat","w");
+  cor = fopen("the_correlator.dat","w");
   
   // T = 3.25;
   // B = 0.002;
@@ -149,7 +157,12 @@ int main( int argc, char ** argv ) {
 
     // Print out the god damn spins    
     fprintf(spn,"\n");
+
+    // Print out the correlator
+
+    fprintf(cor,"%d %f\n",compare,correlator);
   }
+  
 }
 
 void flip( int i, int s0 ) {
@@ -164,6 +177,15 @@ void flip( int i, int s0 ) {
   count++;
   
   neighbor(i,nn);	//  Find nearest neighbors of i
+
+
+
+  // Calculate the improved correlator
+  // parameter, the offset will be fixed
+  if(compare > 0)
+    for ( j = 0; j < NEIGH; j++ )
+      correlator += spin[nn[j]]*spin[i];
+  
   
   for ( j = 0; j < NEIGH; j++ )
     if ( s0 == spin[nn[j]] && rand3() < p )
