@@ -12,7 +12,7 @@
 #include <string.h> // for memset
 //#include <cmath>    // for exp
 
-const int N = 50;
+const int N = 16;
 const int N2 = N*N;
 const int NEIGH = 4;
 

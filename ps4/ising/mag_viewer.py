@@ -1,6 +1,6 @@
 #!/usr/bin/python -i
 
-from ROOT import TCanvas, TGraph
+from ROOT import TCanvas, TGraph, TLatex
 
 import numpy as np
 
@@ -30,9 +30,16 @@ for line in file:
     tt.SetPoint(count,count,float(line.strip()))
     count += 1;
 
-t = tgs([tt],"Magnetization")
+t = tgs([tt],"B = 5#times10^{-5}")
+
 
 t[0].Draw("AL")
+
+t[0].GetYaxis().SetTitle("Magnetization")
+t[0].GetXaxis().SetTitle("Step")
+t[0].GetYaxis().CenterTitle()
+t[0].GetXaxis().CenterTitle()
+
 t[2].Draw()
 
 c1.Update()

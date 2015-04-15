@@ -11,7 +11,7 @@ from methods import *
 temps = np.linspace(0,5.0,1000,endpoint=False)
 
 for t in temps:
-    sp.call(["./cluster",str(t),"0.00", "5000"])
+    sp.call(["./cluster",str(t),"0.00", "1000"])
 
 
 dats = [ j for j in os.listdir(".") if j.startswith("cmdat") and j.endswith(".dat")]
@@ -26,10 +26,12 @@ avg = 0.0
 
 mags = []
 
+print "Scanning through files"
+
 for f in files:
     for l in f:
         n += 1
-        if( n >= 4900):
+        if( n >= 900):
             z += 1
             l.strip()
             avg += float(l)

@@ -4,7 +4,7 @@ import subprocess32 as sp
 import numpy as np
 import os, sys
 import ROOT
-from ROOT import TCanvas, TGraph, gStyle, TF1
+from ROOT import TCanvas, TGraph, gStyle, TF1, TLatex,TPaveText
 from looks import *
 from methods import *
 
@@ -68,10 +68,29 @@ for i in xrange(len(avgs)) :
     tg.SetPoint(i,i,avgs[i])
 
 
+looks_minos()
 
 tf = TF1("tf","[0]*exp([1]*x)+[2]",0,10)
+title =  TPaveText(0.5014368,0.7478814,0.9022989,0.8177966,"nbNDC");
+title.SetFillColor(0);
+title.SetFillStyle(0);
+title.SetLineColor(0);
+
+title.AddText("p0 exp(p1*n) + p2");
+
+
 tg.SetMarkerStyle(6)
 tg.Fit("tf")
 gStyle.SetOptFit(1111)
+tg.SetLineWidth(2)
 tg.Draw("AL")
+title.Draw("SAMES");
 
+tg.GetYaxis().SetTitle("<#sigma_{x} #sigma_{y}>")
+tg.GetXaxis().SetTitle("n")
+tg.GetYaxis().CenterTitle()
+tg.GetXaxis().CenterTitle()
+
+
+c1.Update()
+c1.Modified()

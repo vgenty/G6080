@@ -13,13 +13,16 @@ file = open("the_spins.dat")
 
 c1   = TCanvas()
 
-th2  = TH2D("","",16,1,17,16,1,17)
+l = 50
+
+
+th2  = TH2D("","",l,1,l+1,l,1,l+1)
 th2.Draw("COLZ")
 
 x = 0
 y = 0
 
-N = 256
+N = l * l
 
 th2.GetZaxis().SetRangeUser(-1,1)
 th2.GetZaxis().SetNdivisions(2)
@@ -34,12 +37,12 @@ for line in file:
     spins = line.split(' ')
     th2.Reset()
     for x in xrange(N):
-        if ( x%16 == 0 ): y += 1
-        th2.Fill(x%16+1,y,int(spins[x]))
+        if ( x%l == 0 ): y += 1
+        th2.Fill(x%l+1,y,int(spins[x]))
         
     c1.Update()
     c1.Modified()
-    time.sleep(0.01)
+    time.sleep(0.1)
     x = 0
     y = 0
     

@@ -75,6 +75,44 @@ The integrated autocorrelations times can be found in the following table with a
   \end{center}
 \clearpage
 \section{Problem 2 - Wolff Ising with Metropolis}
-I modified \verb|custer.C| to include presence on non-zero magnetic field. Each step, a cluster is identified by Wolff recursion and stored in \verb|int cluster[N*N]|. The total cluster magnetization $M_c$ is computed. If $B\cdot M_c <= 0$ the cluster is flipped 100\% of the time as is it energetically favorable. If positive, the boltzman weight is computed and a random number chosen. If the random number is less than the boltzman weight the spin is flipped in the direction of the field. The weaker the magnetic field the more likely spins of opposite orientation are flipped. The spin state is outputted into a data file \verb|the_spins.dat| as well as the absolute magnetization as a function of step. The program has also been modified to access three input prameters: temperature, magnetic field, and number of steps. The number of spins is hard coded. 
+\begin{center} {\it Code for this section can be found in \verb|ps4/ising/*| } \end{center}
+I modified \verb|custer.C| to include presence on non-zero magnetic field. Each step, a cluster is identified by Wolff recursion and stored in \verb|int cluster[N*N]|. The total cluster magnetization $M_c$ is computed. If $B\cdot M_c <= 0$ the cluster is flipped 100\% of the time as is it energetically favorable. If positive, the boltzman weight is computed and a random number chosen. If the random number is less than the boltzman weight the spin is flipped in the direction of the field. The weaker the magnetic field the more likely spins of opposite orientation are flipped. The spin state is outputted into a data file \verb|the_spins.dat| as well as the absolute magnetization as a function of step. The program has also been modified to access three input prameters: temperature, magnetic field, and number of steps. The number of spins is hard coded. I made a spin viewer which uses ROOT's TH2D class to display an animation. The output (at fixed metropolis step) is shown in Fig. \ref{animation}. Fig. \ref{fields} shows a a fixed temperature $T=2.2$, $N\times N = 50\times 50$ system of ising spins. As the magnetic field increases the total magnetization tends to freeze in the magnetization. Next we plot the magnetization as a function of temperature $T$ to observe the phase transition at the critical temperature. We use the same $50\times50$ lattice having extrapolated to $B=0$. The figure of merit is shown in Fig. \ref{merit}. When comparing the curve from the analytical solution,
+\begin{align*}
+  \frac{M}{N} = \left(1-\sinh^{-4}\left(\frac{2}{T}\right)\right)^{1/8},
+\end{align*}
+the data fits the solution beautifullly below the critical temperature $T_c$.
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/spin_view.eps}}
+  \caption{\label{animation} Spin animation. The 2D histogram refreshes every metropolis step as the Wolff algorithm identifies and flips clusters.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/B0-T2.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/B5-T2.eps}}\\
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/B55-T2.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/B4-T2.eps}}
+  \caption{\label{fields} Fixed temperature $T=2.2$, changing magnetic field. Increasing the field tends to ``freeze'' in the magnetization over metroplis steps.}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/mag_temp.eps}}\subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/mag_temp_fit.eps}}
+  \caption{\label{merit} Magnetization per unit spin as a funtion of temperature at extrapolated $B=0$ magnetic field. The first figure is the data. The right pane shows the data with the analytical solution overlayed for $T<T_c$ the agreement is fantastic.}
+\end{figure}
+\clearpage
+\section{Problem 3 - Correlation in 2D Ising Model}
+\subsection*{3.1}
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/example_fit_T_22.eps}}
+  \caption{\label{example} Big baby loves d}
+\end{figure}
+
 
 \end{document}
