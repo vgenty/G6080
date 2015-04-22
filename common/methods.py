@@ -6,7 +6,7 @@ def tgs(tgraphs,title) :
     tle = TLegend(0.6,0.4,0.9,0.8)
     tit = TPaveText(0.2988506,0.934322,0.6997126,1,"nbNDC")
 
-    # Make Title:
+    # Make title
     tit.SetFillColor(0)
     tit.SetFillStyle(0)
     tit.SetLineColor(0)
@@ -20,5 +20,17 @@ def tgs(tgraphs,title) :
         tle.AddEntry(tgraphs[i],tgraphs[i].GetName(),"l")
 
     
-    #tmg.SetDrawStyle("AL")
     return [tmg,tle,tit]
+
+def setaxis(obj,X,Y):
+    
+    try:
+        # Method exists, and was used.
+        obj.GetXaxis().SetTitle(X)
+        obj.GetYaxis().SetTitle(Y)
+        obj.GetXaxis().CenterTitle()
+        obj.GetYaxis().CenterTitle()
+
+    except AttributeError:
+        # Method does not exist.
+        print "Object " + str(obj) + " can not access TAxis."
