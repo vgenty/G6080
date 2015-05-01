@@ -4,7 +4,6 @@ INCFLAGS := -I.
 
 all: 1a 1c
 
-
 1a: one.o Recursion.o Plotter.o
 	$(CXX) -Wall  `root-config --glibs --cflags --libs` -o 1a one.o Recursion.o Plotter.o
 
