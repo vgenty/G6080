@@ -24,7 +24,7 @@ EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(VectorXd)
 int main()
 {
 
-  const int N  = 125;
+  const int N  = 100;
   const int N2 = N-2;
   const int NN = pow(N2,2);
   const double a = 1/static_cast<double>(N2);
@@ -39,26 +39,46 @@ int main()
   
   
   //Fill the block diagonal
-  for(int l = 0; l < N2; l++) 
-    for(int i = N2*l; i < N2*(l+1); i++) 
-      for(int j = i; j < N2*(l+1); j++) 
-	if(j==i)         lap(i,j) =  4.0;
-	else if(j==i+1)  lap(i,j) = -1.0;
+  for(int l = 0; l < N2; l++)  {
+    for(int i = N2*l; i < N2*(l+1); i++)  {
+      for(int j = i; j < N2*(l+1); j++)  {
+  	if(l==0 || l==N2-1) {
+  	  if(j==i)
+  	    lap(i,j) = 1.0;
+  	}
+  	else if(j == i && (!(i % N2*l) || !(i % (N2*(l+1)-1)))) {
+  	  lap(i,j) =  1.0;
+  	}
 	
-  //Fill the band -I
-  for(int i = 0; i < NN; i++) 
-    for(int j = i; j < NN; j++) 
-      if(j == i + N2)
-	lap(i,j) = -1.0;
+  	else if(j == i) {
+  	  lap(i,j) = 4.0;
+
+  	  lap(i,j+1)=-1.0;
+  	  lap(i,j-1)=-1.0;
+  	  lap(i,j-N2) = -1.0;
+  	  lap(i,j+N2) = -1.0;
+	  
+  	}
+      }
+    }
+  }
+
+	
+  // //Fill the band -I
+  // for(int i = 0; i < NN; i++) 
+  //   for(int j = i; j < NN; j++) 
+  //     if(j == i + N2 && )
+  // 	lap(i,j) = -1.
+  //0;
 
   //Make symmetric
-  lap.triangularView<Eigen::Lower>() = lap.transpose();
+  //lap.triangularView<Eigen::Lower>() = lap.transpose();
 
   //Place charges
-  rho(floor(0.25*N2)-1,floor(0.50*N2))   = 2.0*a/4.0;
-  rho(floor(0.25*N2)+1,floor(0.50*N2))   = 2.0*a/4.0;
-  rho(floor(0.25*N2)  ,floor(0.50*N2)+1) = 2.0*a/4.0;
-  rho(floor(0.25*N2)  ,floor(0.50*N2)-1) = 2.0*a/4.0;
+  rho(floor(0.25*N2)-1,floor(0.50*N2))   = -20*a/4.0;
+  rho(floor(0.25*N2)+1,floor(0.50*N2))   = -20*a/4.0;
+  rho(floor(0.25*N2)  ,floor(0.50*N2)+1) = -20*a/4.0;
+  rho(floor(0.25*N2)  ,floor(0.50*N2)-1) = -20*a/4.0;
 
   //Get the indicies for the box?
   int x1 = floor((0.625 - 0.125)*N2);
@@ -74,7 +94,6 @@ int main()
     " y2: " << y2 << "\n";
     
   //Flatten it
-  Map<VectorXd> v(rho.data(),rho.size());
 
   //std::cout << lap << std::endl;
 
@@ -84,7 +103,7 @@ int main()
     
   //Try by hand : - (
   int k = 0;
-  int max_iter = 500;
+  int max_iter = 100;
   double tol = pow(10,-5);
 
   
@@ -96,6 +115,29 @@ int main()
     r.push_back(xx);
     x.push_back(xx);
     p.push_back(xx);
+  }
+  
+  //Go to \rho and do subtraction
+  Map<VectorXd> v(rho.data(),rho.size());
+  
+  //Constant potential condition for initial \phi
+  for(int i = 0; i < (x2-x1); ++i) {
+    for(int j = 0; j < (y2-y1); j++) {
+      x[0](x1*N2+y1+i+j*N2) = 0.08;
+      for (int l = 0; l < NN; l++) {
+	lap(x1*N2+y1+i+j*N2,l) = 0.0;
+      }
+    }
+  }
+  
+  for(int i = 0; i < (y2-y1); ++i) {
+    v((x1-1)*N2 + y1 + i) = 0.08;
+    v((x2)*N2   + y1 + i)   = 0.08;
+  }
+
+  for(int i = 0; i < (y2-y1); ++i) {
+    v((x1+i)*N2 + y1-1) = 0.08;
+    v((x1+i)*N2   + y2)   = 0.08;
   }
   
   r[0] = v;
@@ -114,17 +156,10 @@ int main()
     
     auto s = lap*p[z];
     auto a = r[z-1].dot(r[z-1])/(p[z].dot(s));
-    
-    
-    for(int i = 0; i < (x2-x1); ++i) {
-      for(int j = 0; j < (y2-y1); j++) {
-	x[z-1](x1*N2+y1+i+j*N2) = 0.0005;
-      }
-    }
 
     x[z] = x[z-1] + a*p[z];
     r[z] = r[z-1] - a*s;
-    
+
   }
   
   
