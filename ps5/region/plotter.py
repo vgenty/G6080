@@ -1,7 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/python -i
 
-from ROOT import * #import it all who gives a hoot
+from ROOT import    * #import it all who gives a hoot
+from looks import   *
+from methods import *
 
+
+looks_minos()
 
 tfile = TFile("outfile.root","READ")
 ttree = tfile.Get("data")
@@ -31,4 +35,4 @@ tg2d.Draw("SURF1")
 #tg2d.Draw("CONTZ")
 c1.Update()
 c1.Modified()
-raw_input('')
+
