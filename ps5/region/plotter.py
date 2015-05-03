@@ -22,7 +22,7 @@ gStyle.SetPalette(1);
 c1 = TCanvas()
 tg2d = TGraph2D()
 
-p = 98.0;
+p = 32.0;
 
 for i in xrange(int(p)):
     for j in xrange(int(p)):

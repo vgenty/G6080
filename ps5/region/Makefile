@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -std=c++11 -m64
+CXXFLAGS := -O3 -std=c++11 -m64
 INCFLAGS := -I /usr/include/eigen3
 
 
