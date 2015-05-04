@@ -30,8 +30,8 @@ for i in xrange(int(p)):
         c += 1
 
 tg2d.SetTitle("")
-tg2d.Draw("SURF1")
-#tg2d.Draw("P")
+#tg2d.Draw("SURF1")
+tg2d.Draw("P")
 #tg2d.Draw("CONTZ")
 c1.Update()
 c1.Modified()
