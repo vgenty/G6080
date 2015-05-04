@@ -1,11 +1,11 @@
 #!/usr/bin/python -i
 
 from ROOT import    * #import it all who gives a hoot
-from looks import   *
-from methods import *
+#from looks import   *
+#from methods import *
 
 
-looks_minos()
+#looks_minos()
 
 tfile = TFile("outfile.root","READ")
 ttree = tfile.Get("data")
@@ -22,7 +22,7 @@ gStyle.SetPalette(1);
 c1 = TCanvas()
 tg2d = TGraph2D()
 
-p = 32.0;
+p = 101.0
 
 for i in xrange(int(p)):
     for j in xrange(int(p)):

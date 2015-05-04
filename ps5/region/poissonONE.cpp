@@ -24,7 +24,7 @@ EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(VectorXd)
 int main()
 {
 
-  const int N  = 100;
+  const int N  = 50;
   const int N2 = N-2;
   const int NN = pow(N2,2);
   const double a = 1/static_cast<double>(N2);
@@ -44,10 +44,10 @@ int main()
       for(int j = i; j < N2*(l+1); j++)  {
 	if(l==0 || l==N2-1) {
 	  if(j==i)
-	    lap(i,j) = 1.0;
+	    lap(i,j) = 0.0;
 	}
 	else if(j == i && (!(i % N2*l) || !(i % (N2*(l+1)-1)))) {
-	  lap(i,j) =  1.0;
+	  lap(i,j) =  0.0;
 	}
 
 	else if(j == i) {
@@ -97,7 +97,6 @@ int main()
 
   //std::cout << lap << std::endl;
 
-
   //Begin conjugate gradient
   VectorXd xx(NN);
 
@@ -129,53 +128,53 @@ int main()
       }
     }
   }
-
+  
   for(int i = 0; i < (y2-y1); ++i) {
     v((x1-1)*N2 + y1 + i) = 0.08;
     v((x2)*N2   + y1 + i)   = 0.08;
   }
-
+  
   for(int i = 0; i < (y2-y1); ++i) {
     v((x1+i)*N2 + y1-1) = 0.08;
     v((x1+i)*N2   + y2)   = 0.08;
   }
-
+  
   r[0] = v;
   auto z = 0;
   std::cout <<  r[0].squaredNorm() << "\n";
   while( r[z].squaredNorm() > tol && z < max_iter) {
-
+    
     std::cout << "z " << z << " " << r[z].squaredNorm() << "\n";
-
+    
     z++;
-
+    
     if( z == 1 )
       p[1] = r[0];
     else
       p[z] = r[z-1] + r[z-1].dot(r[z-1])/(r[z-2].dot(r[z-2]))*p[z-1];
-
+    
     auto s = lap*p[z];
     auto a = r[z-1].dot(r[z-1])/(p[z].dot(s));
-
+    
     x[z] = x[z-1] + a*p[z];
     r[z] = r[z-1] - a*s;
-
+    
   }
-
-
+  
+  
   // ConjugateGradient<Matrix<double,NN,NN>,Eigen::Lower|Eigen::Upper> cg;
   // cg.compute(lap);
   // x = cg.solve(v);
-
+  
   // std::cout << "#iterations:     " << cg.iterations() << std::endl;
   // std::cout << "estimated error: " << cg.error()      << std::endl;
-
+  
   //Write out to ROOT file
   std::vector<double> *y = new std::vector<double>();
   y->resize(x[z].size());
   for(int o = 0 ; o < y->size(); ++o)
     y->at(o) = x[z](o);
-
+  
   TFile *tf = new TFile("outfile.root","RECREATE");
   TTree *tt = new TTree("data","data");
 
