@@ -28,13 +28,17 @@ Source code can be found at \href{https://github.com/vgenty/G6080/tree/master/ps
 \end{abstract}
 \maketitle
 \section{Poisson's Equations}
-I implemented the conjugate gradient method in \texttt{poissonONE.cpp} to solve poisson's equation for the given charge and boundary conditions. I used the C++ library \texttt{eigen3} which is a template library for linear algebra: matricies, vectors, numerical solvers, and related algorithms. After the completion of the program for the specified lattice spacing the potential is written to a \texttt{ROOT} file and plotted in \texttt{plotter.py}, a python script. For the first part I chose two different nearby locations and computed $V(x,y)$ for a few lattice spacing to see if the points appeared to converge to some value. I think fit a linear function to the data points to extrapolate to zero lattice spacing. The results are plotted in Fig. \ref{extrapolation}. For smaller lattice spacing $a$ the potential appeared to get {\it closer} together signifying a convergence to a true ``continuous'' value. The extrapolation to zero $a$ (the y-intercept) is shown for each of the two plots.  The two calculation of potential are near eachother and should therefore have nearly equivalent y-intercepts with the small deviation being attributed to the change in potential. This is clearly the case. We now plot the potential distribution as a surface plot in \texttt{ROOT}. The salient features of Fig. \ref{poissons} are zero boundary conditions at the edges, a negative point charged situated south of the constant positive potential plateau, and a region of fixed positive potential. In the continuous case the negative charge is considered as a dirac delta function at the point in question, this is not possible for discrete case. To avoid this I smeared out the charge onto the four nearby lattice points creating an effective surface charge rather than a point charge. For smaller and smaller lattice spacing the surface charge will mimick a point of infinite potential. The physical shape of the result in Fig. \red{poissons} is as expected for a solution to the boundary value problem.
+I implemented the conjugate gradient method in \texttt{poissonONE.cpp} to solve poisson's equation for the given charge and boundary conditions. Using the finite difference approximation to discretize the 2-dimensional Poisson equation on a uniform grid,
+\begin{align*}
+(\nabla^2 V)_{ij} = \frac{1}{a^2}\left(V_{i+1,j} + V_{i-1,j} + V_{i,j+1} + V_{i,j-1} - 4V_{ij}\right)
+\end{align*}
+The linear system of $(N+1)^2$ equations is constructed in the form $Ax=b$ where $A$ is the laplace finite difference operator, $x$ is the unknown potential distribution, and $b$ is the specified charge distribution. Special care is needed to ensure dirichlet boundary conditions on the edges of the box {\it and} on a specified region of constant potential. I used the C++ library \texttt{eigen3} which is a template library for linear algebra: matricies, vectors, numerical solvers, and related algorithms. After the completion of the program for the specified lattice spacing the potential is written to a \texttt{ROOT} file and plotted in \texttt{plotter.py}, a python script. For the first part I chose two different nearby locations and computed $V(x,y)$ for a few lattice spacing to see if the points appeared to converge to some value. I then fit a linear function to the data points to extrapolate to zero lattice spacing. The results are plotted in Fig. \ref{extrapolation}. For smaller lattice spacing $a$ the potential appeared to get {\it closer} together signifying a convergence to a true ``continuous'' value. The extrapolation to zero $a$ (the y-intercept) is shown for each of the two plots.  The two calculations of potential are near each other and should therefore have nearly equivalent y-intercepts with the small deviation being attributed to the change in potential. This is clearly the case. We now plot the potential distribution as a surface plot in \texttt{ROOT}. The salient features of Fig. \ref{poissons} are zero boundary conditions at the edges, a negative point charged situated south of the constant positive potential plateau, and a region of fixed positive potential. In the continuous case the negative charge is considered as a dirac delta function at the point in question, this is not possible for discrete case. To avoid this I smeared out the charge onto the four nearby lattice points creating an effective surface charge rather than a point charge. For smaller and smaller lattice spacing the surface charge will mimick a point of infinite potential. The physical shape of the result is shown in Fig. \red{poissons} and is as expected for a solution to the boundary value problem.
 \begin{figure}[h]
   \centering
   \captionsetup[subfigure]{labelformat=empty}
   \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/ex1.eps}}
   \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/ex2.eps}}
-  \caption{\label{extrapolation} Extrapolation of the grid spacing to zero $a$ for two nearby points on the the 2D grid. The fit parameters are shown in the top right of each plot. The variable p0 shows the y-intercept and $a=0$ extrapolation.}
+  \caption{\label{extrapolation} Extrapolation of the grid spacing to zero $a$ for two nearby points on the the 2D grid. The fit parameters are shown in the top right of each plot. The variable p0 shows the y-intercept and the $a=0$ extrapolation.}
 \end{figure}
 \begin{figure}[h]
   \centering
@@ -48,7 +52,7 @@ I implemented the conjugate gradient method in \texttt{poissonONE.cpp} to solve 
 \clearpage
 
 \section{Free particle Schrodinger equation}
-We now consider the quantum mechanics of an uncharged particle bounded in the same square region with the point charge removed. Here we let the mass of the particle be $m=1/10$ in dimensionless units ($\hbar = 1$). The boundary and internal rectangle are infinite potential (where the particle wavefuntion must vanish). I implemented the invserse iteration scheme to find the three lowest eigenvalues of the energy satisfying the equation,
+We now consider the quantum mechanics of an {\it uncharged} particle bounded in the same square region with the point charge removed. Here we let the mass of the particle be $m=1/10$ in dimensionless units ($\hbar = 1$). The boundary and internal rectangle are infinite potential (where the particle wavefuntion must vanish). I implemented the invserse iteration scheme (more or less in the file \texttt{schrodingerPLAY.cpp} to find the three lowest eigenvalues of the energy satisfying the equation,
 \begin{align*}
   -\frac{1}{2m} \nabla^2\psi + V(x,y)\psi = E\psi.
 \end{align*}
@@ -59,7 +63,7 @@ The results for the three lowest probability distributions for the particle in t
     Energy & 151 & 270 & 368
     \end{tabular}
 \end{center}
-The particle in the box resembles the unperturbed harmonic solution to the 2 dimensional square well with the particle avoiding the rectagular region, because of this the energy does not scale as $n^2$ (the square of the numer of anti-nodes). The probability distribution does show the expected increase in number of nodes the higher the energy where is it is more probable on average to be found in a larger region of the box (spreading out).
+The particle in the box resembles the unperturbed harmonic solution to the 2 dimensional square well with the particle avoiding the rectagular region, because of this the energy does not scale as $n^2$ (the square of the numer of anti-nodes). The probability distribution does show the expected increase in number of nodes the higher the energy where is it is more probable on average to be found in a larger region of the box (spreading out classically).
 \begin{figure}[h]
   \centering
   \captionsetup[subfigure]{labelformat=empty}
@@ -74,6 +78,14 @@ The particle in the box resembles the unperturbed harmonic solution to the 2 dim
 
 \clearpage
 \section{Charged particle Schrodinger equation}
-
+I implemented the Lanczos algorithm in C++ to generate the tridiagonal Lanczos matrix. Using the same potential function as as in problem 2 I find the eigen energy associated with charged particle potential to be $\boxed{E\approx-441}$ in dimensionless units. An important feature here is that the eigen value is negative indicating an attractive potential (just as in the case of the hydrogen atom/delta function). The result is shown in Fig. \ref{lanczos}. The particle's probability density clusters around the location of maximum potential as expected from quantum mechanics. In addition the particle tends to sligly avoid the square rectagle although it may be difficult to discern from the plot itself.
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/lanczos1.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/lanczos2.eps}}\\
+\caption{\label{lanczos} ``SURF'' plot for the hydrogen atom in infinite box with infinite rectangle. The particle clusters around the location of maximum potential as in a delta function.}
+\end{figure}
+  We choose the dimensionless point charge to be 50. The probability for the ground state to be in the southern region appears to be {\bf much} larger than 50\%. Unfortunately I was unable to tune to charge enough to get the wavefunction to actually spread out over the region of the box.
 
 \end{document}

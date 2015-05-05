@@ -55,7 +55,7 @@ VectorXd CG(const MatrixXd &A, const VectorXd &b, VectorXd x) {
   auto rso = r.dot(r);
   
   auto max = 1000;
-  // Type deduction on eigen is a joke don't use it
+ 
   for(int i = 0 ;i <= pow(10,6); ++i) {
     auto Ap = A*p;
     auto alpha = rso/(p.dot(Ap));
@@ -63,6 +63,7 @@ VectorXd CG(const MatrixXd &A, const VectorXd &b, VectorXd x) {
     x = x + alpha*p;
 
     r = r - alpha*Ap;
+    
     auto rsn = r.dot(r);
     
     if(sqrt(rsn) < pow(10,-3) || i == max)
@@ -70,7 +71,7 @@ VectorXd CG(const MatrixXd &A, const VectorXd &b, VectorXd x) {
     
     p = r + (rsn/rso)*p;
     rso = rsn;
-    std::cout << i << " " << rsn << "\n";
+    //std::cout << i << " " << rsn << "\n";
   }
 
   return x;
@@ -84,34 +85,33 @@ int main()
   std::cout << "\tProposed lattice spacing a:        " << a  << "\n";
   std::cout << "\tProposed lattice lattice points N: " << NN << "\n";
 
-
-  auto p = floor((0.5 + a/2)/a);
-  auto q = floor((0.25 + a/2)/a);
-  
+  int l;
   MatrixXd lap = MatrixXd::Zero(NN,NN); // Laplace
   VectorXd rho = VectorXd::Zero(NN); // Rho later we will flatten
   VectorXd x   = VectorXd::Random(NN); // Rho later we will flatten
+
   auto d = 10;
   
-  auto c = 50;
+  auto c = 50 ;
   
-  auto loc_x = (0.5  + a/2)*(N+1);
-  auto loc_y = (0.25 + a/2)*(N+1);
+  auto loc_x_start = (0.5  + a/2);
+  auto loc_y_end   = (0.25 + a/2);
   
-  auto xstart = loc_x*a;
-  auto ystart = loc_y*a;
+  auto xstart = loc_x_start;
+  auto ystart = loc_y_end;
   
   for(int i = 0; i < NN; ++i) {
-    auto pt = i/(N+1)*a;
-    auto qt = fmod(i,N+1)*a;
-
-    auto xend = pt*a;
-    auto yend = qt*a;
-    auto V = c*c/sqrt(pow((xend-xstart),2)+pow(yend-ystart,2));
-
+    auto loc_x_end = floor(i/(N+1));
+    auto loc_y_end = fmod(i,N+1);
+    l=0;
+    auto xend = loc_x_end*a;
+    auto yend = loc_y_end*a;
+    
+    auto V = -c/(sqrt(pow((xend-xstart),2)+pow(yend-ystart,2)));
     std::cout << V << std::endl;
+    
     if(!check_boundary(i) && !check_in_box(i)) {
-      lap(i,i) = -4.0/pow(a,2) + V;
+      lap(i,i) = -4.0/pow(a,2) - V/5;
       
       for(int nei : {i+1,i-1,i+N+1,i-N-1}) {
 	if( nei < NN && nei > 0){
@@ -125,22 +125,78 @@ int main()
     }
   }
   
-  lap = -1.0*lap/20.0;
-    
-  auto e = .87246;
+  lap = -1.0*lap*5.0; // (1/2m);
+  
+  auto e = -500;
   auto LAP = lap - e * MatrixXd::Identity(NN,NN); // Laplace
   
-  VectorXd tr = VectorXd::Random(NN);
   
   std::cout << std::endl;
   std::cout << "get it done\n";
   VectorXd yy;
+  
+  VectorXd rrr = VectorXd::Zero(NN);
+  
+  std::vector<VectorXd> tr;
+  std::vector<VectorXd> w;
+  std::vector<double> al;
+  std::vector<double> beta;
+  
+  for(int h = 0; h < 1000; ++h) {
+    tr.push_back(rrr);
+    w.push_back(rrr);
+   
+    beta.push_back(0.0);
+    al.push_back(0.0);
+  }
+  std::cout << "a\n";
+  
+  tr[0] = VectorXd::Zero(NN);
+  tr[1] = VectorXd::Random(NN);
+  int j = 100;
+  std::cout << "b\n";
+  //#if/**/ l//Implement lanczos algorithm
+  
+  for(int pp = 1 ; pp < j-2; ++pp) {
+    w[pp]  =lap*tr[pp];
 
+      
+    al[pp] = w[pp].dot(tr[pp]);
+    w[pp] = w[pp] - al[pp]*tr[pp] - beta[pp]*tr[pp-1];
+    
+    beta[pp+1] = w[pp].norm();
+    tr[pp+1] = w[pp]/beta[pp+1];
+    
+    std::cout << pp << "\n";
+  }
+  w[j-1]  = lap*tr[j-1];
+  al[j-1] = w[j-1].dot(tr[j-1]);
+
+  //Create tri-diagonal LANCZOS matrix
+  std::cout << "tri-diagonal LANCZOS" << "\n";
+  MatrixXd T(j,j);
+  
+  for(int ppp = 0; ppp < j; ++ppp){
+      
+    T(ppp,ppp)   = al[ppp];
+    
+    if(ppp+1 < j)
+      T(ppp+1,ppp) = beta[ppp+1];
+    if(ppp-1 > 0)
+      T(ppp-1,ppp) = beta[ppp+1];
+
+  }
+
+  std::cout << T << std::endl;
+  
+  //#end
+  
+  
   for(int w = 0; w < 1000; ++w) {
-    yy = CG(LAP,x,tr);
+    yy = CG(LAP,x,x);
     yy = yy / yy.norm();
     auto p = (yy-x).norm()/yy.size();
-    std::cout << p << std::endl;
+    //d::cout << p << std::endl;
     if(p < pow(10,-3.5))
       break;
     

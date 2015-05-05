@@ -1,11 +1,11 @@
 #!/usr/bin/python -i
 
 from ROOT import    * #import it all who gives a hoot
-#from looks import   *
-#from methods import *
+from looks import   *
+from methods import *
 
 
-#looks_minos()
+looks_minos()
 
 tfile = TFile("outfile.root","READ")
 ttree = tfile.Get("data")
@@ -26,12 +26,12 @@ p = 101.0
 
 for i in xrange(int(p)):
     for j in xrange(int(p)):
-        tg2d.SetPoint(c,i/p,j/p,k[c])
+        tg2d.SetPoint(c,i/p,j/p,k[c]*k[c])
         c += 1
 
 tg2d.SetTitle("")
-#tg2d.Draw("SURF1")
-tg2d.Draw("P")
+tg2d.Draw("SURF1")
+#tg2d.Draw("P")
 #tg2d.Draw("CONTZ")
 c1.Update()
 c1.Modified()
