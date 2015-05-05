@@ -1,12 +1,18 @@
+//Usual garbage
 #include <iostream>
 #include <cmath>
 #include <memory>
 #include <vector>
 #include <iomanip>
+
+//Tell eigen to use the whole stack if necessary
 #define EIGEN_STACK_ALLOCATION_LIMIT 0
+
+//Eigen garbage
 #include <Eigen/Eigen>
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/StdVector>
+#include <Eigen/Cholesky>
 
 using Eigen::SparseMatrix;
 using Eigen::Matrix;
@@ -16,10 +22,13 @@ using Eigen::Map;
 using Eigen::ConjugateGradient;
 using Eigen::aligned_allocator;
 
+//Tell Eigen I want VectorXd in std::vector<T>
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(VectorXd)
+
+//ROOT garbage
 #include "TFile.h"
 #include "TTree.h"
 
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(VectorXd)
 const int N  = 100;
 const int NN = pow(N+1,2);
 const double a = 1/static_cast<double>(N);
@@ -88,7 +97,7 @@ int main()
   int l;
   MatrixXd lap = MatrixXd::Zero(NN,NN); // Laplace
   VectorXd rho = VectorXd::Zero(NN); // Rho later we will flatten
-  VectorXd x   = VectorXd::Random(NN); // Rho later we will flatten
+  VectorXd x   = VectorXd::Random(NN);
 
   auto d = 10;
   
@@ -155,7 +164,7 @@ int main()
   tr[1] = VectorXd::Random(NN);
   int j = 100;
   std::cout << "b\n";
-  //#if/**/ l//Implement lanczos algorithm
+  //Implement lanczos algorithm
   
   for(int pp = 1 ; pp < j-2; ++pp) {
     w[pp]  =lap*tr[pp];
@@ -190,7 +199,8 @@ int main()
   std::cout << T << std::endl;
   
   //#end
-  
+  //Cholsky decomposition to find eigenvector
+  LLT<MatrixXd> lltOfA(T);  
   
   for(int w = 0; w < 1000; ++w) {
     yy = CG(LAP,x,x);
@@ -204,10 +214,12 @@ int main()
     
   }
   
+
+  //print out the eigenvalue
   std::cout << "Eigenvalue\n" << std::endl;
   std::cout << (lap*yy).norm()/yy.norm() << std::endl;
  
-  //Write out to ROOT file
+  //Write data out to ROOT file : - )
   std::vector<double> *y = new std::vector<double>();
   y->resize(yy.size());
   for(int o = 0 ; o < y->size(); ++o)
