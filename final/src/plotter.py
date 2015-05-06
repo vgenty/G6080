@@ -2,11 +2,11 @@
 
 from ROOT import    * #import it all who gives a hoot
 import numpy as np
-#from looks import   *
-#from methods import *
+from looks import   *
+from methods import *
 #from root_numpy import root2array, root2rec, tree2rec
 
-#looks_minos()
+looks_minos()
 
 tfile = TFile("outfile.root","READ")
 ttree = tfile.Get("data")
@@ -17,8 +17,7 @@ c1 = TCanvas()
 c1.cd()
 
 tg = TGraph()
-tg.SetTitle("")
-
+tg.SetLineWidth(2)
 c = 0
 
 for e in ttree:
@@ -26,8 +25,11 @@ for e in ttree:
         tg.SetPoint(c,e.x[o],e.y[o])
         c+=1
     tg.Draw("AL")
-    tg.GetYaxis().SetRangeUser(0,1.0)
-
+    tg.GetYaxis().SetRangeUser(0,20.0)
+    tg.GetXaxis().SetTitle("x")
+    tg.GetYaxis().SetTitle("|#psi|^{2}")
+    tg.GetXaxis().CenterTitle()
+    tg.GetYaxis().CenterTitle()
     c1.Update()
     c1.Modified()
 
