@@ -1,11 +1,10 @@
 #include "methods.h"
 
-
 int main(int argc, char** argv) {
   
   auto a = double{0.01};
   auto L = 2.0;
-  auto T = 100;
+  auto T = 250;
   auto N = floor(L/a);
 
 
@@ -57,24 +56,28 @@ int main(int argc, char** argv) {
     psi[0](i) = wave_packet(xx[i]);
   }
   
+
+    
   //ConjugateGradient<SparseMatrix<std::complex<double> > > cg;
   BiCGSTAB<SparseMatrix<std::complex<double>> > solver;
   VectorXcd chi(N+1);
 
   //solver.compute(W);
-  for(int j = 0; j < T; ++j) {
+  for(int j = 0; j < T-1; ++j) {
     chi = solver.compute(W).solve(psi[j]);
     psi[j+1] = chi - psi[j];
   }
 
-  
+
   //Convert VectorXcd to std::vector<std::complex<double> >
+
+	
   std::for_each(psi.begin(),psi.end(),[&](VectorXcd p){
       for(int o = 0 ; o < N+1; ++o)
 	y->at(o) = std::norm(p(o));
       tt->Fill();
     });
-  
+    
   tt->Write();
   tf->Close();
   

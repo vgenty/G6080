@@ -4,14 +4,14 @@ from ROOT import    * #import it all who gives a hoot
 import numpy as np
 #from looks import   *
 #from methods import *
-#from root_numpy import root2array, root2rec, tree2rec
+from root_numpy import root2array, root2rec, tree2rec
 
 #looks_minos()
 
 tfile = TFile("outfile.root","READ")
 ttree = tfile.Get("data")
 
-#rec = tree2rec(ttree)
+rec = tree2rec(ttree)
 
 c1 = TCanvas()
 c1.cd()
