@@ -9,6 +9,7 @@
 #include <Eigen/Eigen>
 #include <Eigen/IterativeLinearSolvers>
 #include <Eigen/StdVector>
+#include <Eigen/SparseLU>
 
 using Eigen::SparseMatrix;
 using Eigen::Matrix;
@@ -19,6 +20,8 @@ using Eigen::VectorXd;
 using Eigen::Map;
 using Eigen::ConjugateGradient;
 using Eigen::BiCGSTAB;
+using Eigen::SparseLU;
+
 #include "TFile.h"
 #include "TTree.h"
 
