@@ -1,7 +1,7 @@
 #CXX := clang++
 CXXFLAGS := -O3 -std=c++1y -m64
-#INCFLAGS := -I /usr/local/opt/eigen/include/eigen3
-INCFLAGS := -I /usr/include/eigen3
+INCFLAGS := -I /usr/local/opt/eigen/include/eigen3
+#INCFLAGS := -I /usr/include/eigen3
 
 all: ev
 

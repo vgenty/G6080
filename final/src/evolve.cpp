@@ -10,7 +10,7 @@ double pi();
 std::tuple<SparseMatrix<std::complex<double> >,
 	   SparseMatrix<std::complex<double> > > get_LU(SparseMatrix<std::complex<double> >&);
 
-VectorXcd back_sub(SparseMatrix<std::complex<double> >&,
+VectorXcd solve_LU(SparseMatrix<std::complex<double> >&,
 		   SparseMatrix<std::complex<double> >&,
 		   VectorXcd&);
   
@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
   W  *= dt/(pow(dx,2.0)*8.0*ii);
   //Wb *= (-1.0*dt)/(pow(dx,2.0)*8.0*ii);
 
-  //get_LU(W);
+  get_LU(W);
+  VectorXd xxx = solve_LU(
 
   
   BiCGSTAB<SparseMatrix<std::complex<double>> > solver;
@@ -191,34 +192,34 @@ std::tuple<SparseMatrix<std::complex<double> >,
   return make_pair(L,U);
 }
 
-VectorXcd back_sub(SparseMatrix<std::complex<double> >& L,
+VectorXcd solve_LU(SparseMatrix<std::complex<double> >& L,
 		   SparseMatrix<std::complex<double> >& U,
 		   VectorXcd& b) {
-  //Vic's implementation of LU I steal from ludcmp.h Numerical Recipies
+  //Vic's implementation of LU
   auto Np1 = L.rows();
+  VectorXcd y(Np1);
+  VectorXcd x(Np1);
 
-    Int i,ii=0,ip,j;
-    Doub sum;
-    if (b.size() != n || x.size() != n)
-      throw("LUdcmp::solve bad sizes");
-    for (i=0;i<n;i++) x[i] = b[i];
-    for (i=0;i<n;i++) {
-      ip=indx[i];
-      sum=x[ip];
-      x[ip]=x[i];
-      if (ii != 0)
-	for (j=ii-1;j<i;j++) sum -= lu[i][j]*x[j];
-      else if (sum != 0.0)
-	ii=i+1;
-      x[i]=sum;
-    }
-    for (i=n-1;i>=0;i--) {
-      sum=x[i];
-      for (j=i+1;j<n;j++) sum -= lu[i][j]*x[j];
-      x[i]=sum/lu[i][i];
-    }
-  }
+
+  //Forward
+  y(0) = b(0);
+  for(int i=0; i < Np1; ++i) y(i) = f(i) - L(i,i-1)*y(i-1);
+
+  for(int i=0; i < Np1; ++i) 
+    if(U(i,i))
+      x(i) = y(i)/U(i,i);
+    else
+      x(i) = 0.0;
+
+  //Backwards
+  for(int i=Np1-2; i >= 0; i--) 
+    if(U(i,i))
+      x(i) = (y(i) - U(i,i+1)*x(i+1))/U(i,i);
+    else
+      x(i) = 0.0;
   
+  
+  return x;
 
 }
 
