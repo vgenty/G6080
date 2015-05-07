@@ -1,25 +1,28 @@
 #include "includes.h"
 
+typedef SparseMatrix<std::complex<double> > SMCD;
+
 std::complex<double> ii(0,1);
 
-double V(const double);
+double V(const double,const double);
 std::complex<double> wave_packet(const double&, const double,
 				 const double,  const double);
 double pi();
 
-std::tuple<SparseMatrix<std::complex<double> >,
-	   SparseMatrix<std::complex<double> > > get_LU(SparseMatrix<std::complex<double> >&);
+std::tuple<SMCD,
+	   SMCD > get_LU(SMCD&);
 
-VectorXcd solve_LU(SparseMatrix<std::complex<double> >&,
-		   SparseMatrix<std::complex<double> >&,
+VectorXcd solve_LU(SMCD&,
+		   SMCD&,
 		   VectorXcd&);
+
   
 int main(int argc, char** argv) {
 
 
   //Fixed parameters
   //auto a = double{0.004};
-  auto a = double{0.01};
+  auto a = double{0.001};
   auto L = 2.0;
   auto T = 10000;
   auto N = floor(L/a);
@@ -30,22 +33,26 @@ int main(int argc, char** argv) {
   std::vector<double> xx(N+1,0.0);
 
   //Possibly user defined parameters
-  double E0    = 1000; //Incoming packet energy
-  double sigma = 0.08;
-  
+  double E0    = 3000; //Incoming packet energy
+  double V0    = E0*atof(argv[1]);
+  double sigma = 0.05;
+  //std::string filename = 
+    
   //Just let mass of particle be m=1 why not
   
   //ROOT stuff
-  TFile *tf = new TFile("outfile.root","RECREATE");
+  TFile *tf = new TFile(argv[2],"RECREATE");
   TTree *tt = new TTree("data","data");
   
   std::vector<double> *y 
     = new std::vector<double>(N+1,0.0);
-  double *psi2 = new double();
+  double psi2;
+  double ref = 0.0;
   
   tt->Branch("y",&y); //address of pointer
-  tt->Branch("x",&xx); //address of pointer
+  tt->Branch("x",&xx); 
   tt->Branch("psi2",&psi2,"psi2/D");
+  tt->Branch("ref" ,&ref ,"ref/D");
   
   std::cout << "\n\t=== 1d Schrodinger on chain ===\n";
   std::cout << "\n";
@@ -53,8 +60,8 @@ int main(int argc, char** argv) {
   std::cout << "\tProposed lattice points N: " << N << "\n\n";
   
   
-  SparseMatrix<std::complex<double> > W(N+1,N+1);
-  //SparseMatrix<std::complex<double> > Wb(N+1,N+1);
+  SMCD W(N+1,N+1);
+  //SMCD Wb(N+1,N+1);
   //SparseMatrix<double> W(N+1,N+1);
   
   std::vector<VectorXcd> psi(T,VectorXcd::Zero(N+1));
@@ -64,13 +71,13 @@ int main(int argc, char** argv) {
   //Index to lattice space conversion
   for(unsigned int i = 0; i < xx.size(); ++i) {
     xx[i] = -1 + a*i;
-    psi[0](i) = wave_packet(xx[i],E0,sigma,-0.2);
+    psi[0](i) = wave_packet(xx[i],E0,sigma,-0.5);
   }
 
   
   //Initialize W;
   for(int i = 1; i < N; ++i) {
-    W.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/dt - 2.0*pow(dx,2)*V(xx[i]));
+    W.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/dt - 2.0*pow(dx,2)*V(xx[i],V0));
     if(i>1) W.insert(i-1,i) = 1.0;
     if(i<N-1) W.insert(i+1,i) = 1.0;
     //Wb.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/(-1.0*dt) - 2.0*pow(dx,2)*V(xx[i]));
@@ -84,40 +91,40 @@ int main(int argc, char** argv) {
   W  *= dt/(pow(dx,2.0)*8.0*ii);
   //Wb *= (-1.0*dt)/(pow(dx,2.0)*8.0*ii);
 
-  get_LU(W);
-  VectorXd xxx = solve_LU(
+  //Setup Factor W
+  SMCD LL;
+  SMCD UU;
+  std::tie(LL,UU) = get_LU(W);
 
+  //Check solution for psi[t=0]
+  //VectorXcd xxx = solve_LU(LL,UU,psi[0]);
   
-  BiCGSTAB<SparseMatrix<std::complex<double>> > solver;
-  //  SparseLU<SparseMatrix<std::complex<double> > > solver;
-  W.makeCompressed();
-  //solver.analyzePattern(W);
-  //solver.factorize(W); 
+  // BiCGSTAB<SMCD> solver;
+  // W.makeCompressed();
   VectorXcd chi(N+1);
 
   //solver.compute(W);
   for(int j = 0; j < T-1; ++j) {
-    //std::cout << j << "\n";
-    //chi = solver.solve(psi[j]);
-    
-    //if(j < floor((T-1)/2))
-    chi = solver.compute(W).solve(psi[j]);
-    //else
-    //chi = solver.compute(Wb).solve(psi[j]);
-    
+    //chi = solver.compute(W).solve(psi[j]);
+    chi = solve_LU(LL,UU,psi[j]);
     psi[j+1] = chi - psi[j];
   }
 
-
   //Convert VectorXcd to std::vector<std::complex<double> >
-
-	
+  //Lambda is the best way to go here
+  
+  double rref;
   std::for_each(psi.begin(),psi.end(),[&](VectorXcd p){
-      for(int o = 0 ; o < N+1; ++o)
-	y->at(o) = std::norm(p(o));
+      rref = 0.0;
       
-      *psi2 = (p.dot(p)).real()*dx;
-
+      for(int o = 0 ; o < N+1; ++o) {
+	y->at(o) = std::norm(p(o));
+	if(xx[o] < 0.0)
+	  rref += std::norm(p(o))*dx; 
+      }
+      
+      psi2 = (p.dot(p)).real()*dx;
+      ref  = rref;
       tt->Fill();
     });
     
@@ -148,10 +155,9 @@ std::complex<double> wave_packet(const double& x,
   //return cos(pi()*x/2.0)*cos(pi()*x/3.0);
 }
 
-double V(const double x) {
-  auto V0 = 0.0;
-  auto Vw = 0.25;
-  auto Vc = 0.75;
+double V(const double x,const double V0) {
+  auto Vw = 1.0;
+  auto Vc = 0.50;
 
   if(fabs(x - Vc) <= Vw/2.0)
     return V0;
@@ -159,17 +165,15 @@ double V(const double x) {
     return 0.0;
 }
 
-std::tuple<SparseMatrix<std::complex<double> >,
-	   SparseMatrix<std::complex<double> > > get_LU(SparseMatrix<std::complex<double> >& A) {
+std::tuple<SMCD,SMCD> get_LU(SMCD& A) {
 
-  SparseMatrix<std::complex<double> > L(A.rows(),A.rows());
-  SparseMatrix<std::complex<double> > U(A.rows(),A.rows());
+  SMCD L(A.rows(),A.rows());
+  SMCD U(A.rows(),A.rows());
 
 
   auto Np1 = A.rows();
  
   for(int i = 0; i < Np1; ++i) {
-    std::cout << i << std::endl;
     L.insert(i,i) = 1.0;
     if(i < Np1-1)
       U.insert(i,i+1) = A.coeff(i,i+1);
@@ -184,41 +188,36 @@ std::tuple<SparseMatrix<std::complex<double> >,
     
   }
   
-  //td::cout << L*U << std::endl;
-  std::cout << "LU\n";
-  std::cout << L*U << std::endl;
-  std::cout << "A\n";
-  std::cout << A << std::endl;
   return make_pair(L,U);
 }
 
-VectorXcd solve_LU(SparseMatrix<std::complex<double> >& L,
-		   SparseMatrix<std::complex<double> >& U,
-		   VectorXcd& b) {
-  //Vic's implementation of LU
+VectorXcd solve_LU(SMCD& L, SMCD& U, VectorXcd& b) {
+
+  //Vic's implementation of LU, seems speedy enough
+
   auto Np1 = L.rows();
   VectorXcd y(Np1);
   VectorXcd x(Np1);
 
-
-  //Forward
+  //Forward substitution
   y(0) = b(0);
-  for(int i=0; i < Np1; ++i) y(i) = f(i) - L(i,i-1)*y(i-1);
-
+  for(int i=1; i < Np1; ++i) 
+    y(i) = b(i) - L.coeff(i,i-1)*y(i-1);
+  
+   //Backward substition
   for(int i=0; i < Np1; ++i) 
-    if(U(i,i))
-      x(i) = y(i)/U(i,i);
+    if(U.coeff(i,i) != 0.0)
+      x(i) = y(i)/U.coeff(i,i);
     else
       x(i) = 0.0;
 
-  //Backwards
-  for(int i=Np1-2; i >= 0; i--) 
-    if(U(i,i))
-      x(i) = (y(i) - U(i,i+1)*x(i+1))/U(i,i);
+  for(int i=Np1-1; i >= 0; i--) 
+    if(U.coeff(i,i) != 0.0)
+      x(i) = (y(i) - U.coeff(i,i+1)*x(i+1))/U.coeff(i,i);
     else
       x(i) = 0.0;
   
-  
+
   return x;
 
 }
