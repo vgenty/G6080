@@ -84,4 +84,21 @@ Rearranging we can choose the input momentum based on the given energy,
 \eq{
 k = \sqrt{2 E - \frac{1}{2\sigma^2}}
   }
+I checked my implementation of the algorithm, specifically my implementation of the LU factorization of the tridiagonal matrix. I evolved the free particle for a total time step of 1000, 500 steps in the forward direction then fliping the sign of the time step $dt$ and then evolving 499 steps in the reverse direction to check for unitarity. Snapshots of the wavepackets are shown in Fig. \ref{evolution}. The wavepackets are nearly identical before and after the evolution. As the gaussian propogates it spreads out in position as epected from a free particle. The elongated wave at $t=T/2$ then begins narrowing as the algorithm is reversed. We check the unitarity of the state as a function of time and plot in Fig. \ref{unitarity}. The unitarity of the state does not deviate from one out of IEEE double precision during the duration of the test simulation indicating fantastic conserved unitarity.
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/packet_t0.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/packet_t846.eps}}\\
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/packet_t999.eps}}
+  \caption{\label{evolution} Position space snap-shots of the specified gaussian wavepacket at three different time slices. The top left pane shows the initial state at $t=0$. The top right pane shows the impact of the gaussian wave packet with the infinite wall in reversed time. The bottom pane shows the state returning to its initial configuration.}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/unitarity.eps}}
+  \caption{\label{unitarity} Integral norm squared of gaussian wave packet as a function of time. }
+\end{figure}
+\subsection*{1.3 Scattering from a step function potential}
+We scatter wavepackets of varying widths and incident energies at step potentials. For this problem we must ensure the wavepacket is sufficiently localized and therefore energetic enough to quickly scatter off the step potential without encountering effects from hitting the infinite walls.
 \end{document}

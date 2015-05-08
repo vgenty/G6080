@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   //auto a = double{0.004};
   auto a = double{0.001};
   auto L = 2.0;
-  auto T = 10000;
+  auto T = 1000;
   auto N = floor(L/a);
 
   double dx = a;
@@ -80,27 +80,27 @@ int main(int argc, char** argv) {
     W.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/dt - 2.0*pow(dx,2)*V(xx[i],V0));
     if(i>1) W.insert(i-1,i) = 1.0;
     if(i<N-1) W.insert(i+1,i) = 1.0;
-    //Wb.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/(-1.0*dt) - 2.0*pow(dx,2)*V(xx[i]));
-    //if(i>1) Wb.insert(i-1,i) = 1.0;
-    //if(i<N-1) Wb.insert(i+1,i) = 1.0;
-    // W.insert(i,i)   = 2.0;
-    // if(i>1)   W.insert(i,i-1) = 1.0;
-    // if(i<N-1) W.insert(i,i+1) = 1.0;
+    
+    // Wb.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/(-1.0*dt) - 2.0*pow(dx,2)*V(xx[i],V0));
+    // if(i>1) Wb.insert(i-1,i) = 1.0;
+    // if(i<N-1) Wb.insert(i+1,i) = 1.0;
+
   }
   
   W  *= dt/(pow(dx,2.0)*8.0*ii);
   //Wb *= (-1.0*dt)/(pow(dx,2.0)*8.0*ii);
 
-  //Setup Factor W
+  //Setup Factorization of W
   SMCD LL;
   SMCD UU;
   std::tie(LL,UU) = get_LU(W);
-
+  
   //Check solution for psi[t=0]
   //VectorXcd xxx = solve_LU(LL,UU,psi[0]);
   
-  // BiCGSTAB<SMCD> solver;
-  // W.makeCompressed();
+  //BiCGSTAB<SMCD> solver;
+  //W.makeCompressed();
+ 
   VectorXcd chi(N+1);
 
   //solver.compute(W);
@@ -116,11 +116,11 @@ int main(int argc, char** argv) {
   double rref;
   std::for_each(psi.begin(),psi.end(),[&](VectorXcd p){
       rref = 0.0;
-      
+
       for(int o = 0 ; o < N+1; ++o) {
 	y->at(o) = std::norm(p(o));
 	if(xx[o] < 0.0)
-	  rref += std::norm(p(o))*dx; 
+	  rref += std::norm(p(o))*dx;
       }
       
       psi2 = (p.dot(p)).real()*dx;
