@@ -6,7 +6,8 @@ std::complex<double> ii(0,1);
 
 double V(const double,const double);
 std::complex<double> wave_packet(const double&, const double,
-				 const double,  const double);
+				 const double,  const double,
+				 const double);
 double pi();
 
 std::tuple<SMCD,
@@ -22,7 +23,7 @@ int main(int argc, char** argv) {
 
   //Fixed parameters
   //auto a = double{0.004};
-  auto a = double{0.001};
+  auto a = double{0.0005};
   auto L = 2.0;
   auto T = 1000;
   auto N = floor(L/a);
@@ -33,11 +34,19 @@ int main(int argc, char** argv) {
   std::vector<double> xx(N+1,0.0);
 
   //Possibly user defined parameters
-  double E0    = 3000; //Incoming packet energy
-  double V0    = E0*atof(argv[1]);
-  double sigma = 0.05;
-  //std::string filename = 
-    
+  double V0    = 3000;
+  double E0    = V0*atof(argv[1]); //Incoming packet energy
+  //  double sigma = 0.05;
+  double sigma = atof(argv[3]);
+  
+  auto k = sqrt(2.0*E0-1.0/(2.0*pow(sigma,2.0)));
+  if(k != k) {
+    std::cout << "Nan observed, increase the energy 2*E = "
+	      << 2.0 * E0 << " other part is "
+	      << 1.0/(2.0*pow(sigma,2.0)) << " \n";
+    std::exit(1);
+  }
+  
   //Just let mass of particle be m=1 why not
   
   //ROOT stuff
@@ -57,7 +66,10 @@ int main(int argc, char** argv) {
   std::cout << "\n\t=== 1d Schrodinger on chain ===\n";
   std::cout << "\n";
   std::cout << "\tProposed chain space a:    " << a  << "\n";
-  std::cout << "\tProposed lattice points N: " << N << "\n\n";
+  std::cout << "\tProposed lattice points N: " << N  << "\n";
+  std::cout << "\tIncident energy:           " << E0 << "\n";
+  std::cout << "\tStep potential:            " << V0 << "\n";
+  std::cout << "\tVelocity:                  " << k  << "\n";
   
   
   SMCD W(N+1,N+1);
@@ -71,7 +83,7 @@ int main(int argc, char** argv) {
   //Index to lattice space conversion
   for(unsigned int i = 0; i < xx.size(); ++i) {
     xx[i] = -1 + a*i;
-    psi[0](i) = wave_packet(xx[i],E0,sigma,-0.5);
+    psi[0](i) = wave_packet(xx[i],E0,sigma,-1.0,k);
   }
 
   
@@ -139,16 +151,10 @@ double pi() { return 4.0*atan(1.0); }
 std::complex<double> wave_packet(const double& x,
 				 const double E,
 				 const double sigma,
-				 const double x0) {
+				 const double x0,
+				 const double k) {
   
   //Derive k from expectation value of E <\psi|p^2/2m|\psi>
-  auto k = sqrt(2.0*E-1.0/(2.0*pow(sigma,2.0)));
-  if(k != k) {
-    std::cout << "Nan observed, increase the energy 2*E = "
-	      << 2.0 * E << " other part is "
-	      << 1.0/(2.0*pow(sigma,2.0)) << " \n";
-    std::exit(1);
-  }
   
   return 1/sqrt(sigma*sqrt(pi()))*exp(ii*k*x)*exp(-1.0*pow(x-x0,2.0)/(2*pow(sigma,2.0)));
   //Try eigenstate
@@ -156,9 +162,9 @@ std::complex<double> wave_packet(const double& x,
 }
 
 double V(const double x,const double V0) {
-  auto Vw = 1.0;
-  auto Vc = 0.50;
-
+  auto Vw = 2.0;
+  auto Vc = 1.0;
+  
   if(fabs(x - Vc) <= Vw/2.0)
     return V0;
   else
@@ -166,13 +172,13 @@ double V(const double x,const double V0) {
 }
 
 std::tuple<SMCD,SMCD> get_LU(SMCD& A) {
-
+  
   SMCD L(A.rows(),A.rows());
   SMCD U(A.rows(),A.rows());
-
-
+  
+  
   auto Np1 = A.rows();
- 
+  
   for(int i = 0; i < Np1; ++i) {
     L.insert(i,i) = 1.0;
     if(i < Np1-1)
@@ -182,7 +188,7 @@ std::tuple<SMCD,SMCD> get_LU(SMCD& A) {
     else {
       if(U.coeff(i-1,i-1) != 0.0)
 	L.insert(i,i-1) = A.coeff(i-1,i)/U.coeff(i-1,i-1);
-
+      
       U.insert(i,i)   = A.coeff(i,i) - L.coeff(i,i-1)*A.coeff(i-1,i);
     }	
     

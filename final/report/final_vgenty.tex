@@ -100,5 +100,34 @@ I checked my implementation of the algorithm, specifically my implementation of 
   \caption{\label{unitarity} Integral norm squared of gaussian wave packet as a function of time. }
 \end{figure}
 \subsection*{1.3 Scattering from a step function potential}
-We scatter wavepackets of varying widths and incident energies at step potentials. For this problem we must ensure the wavepacket is sufficiently localized and therefore energetic enough to quickly scatter off the step potential without encountering effects from hitting the infinite walls.
+We scatter wavepackets of varying widths and incident energies at step potentials. For this problem we must ensure the wavepacket is sufficiently localized and therefore energetic enough to quickly scatter off the step potential without encountering effects from hitting the infinite walls. In Fig. \ref{EoverV} I plot the reflection and transmission coefficient for two fixed step potentials as a function of incoming energy at fixed width $\sigma=0.05$ (essentially the varying the average wavenumber $k$). A smooth rise of the transmission and lull of the of the reflection coefficient is observed for increasing energy. This result is different than for discrete incoming plane waves with fixed wavenumber. The quantum wave train softens the edge between at the classically allowed turning point which is expected as the wavepacket contains a distribution of wavenumbers based on it's width. Doubling the potential only had the effect of increasing the curvature of the reflection and transmission lines. Next I examine the two coefficients as a function of initial width in Fig. \ref{sigmas}. The wider the initial wavepacket the more defined the incoming value for the wavenumber since $k\propto 1/\sigma$. In Fig. \ref{sigmas} the reflection and tranmission coefficients approach their analytical plane wave values for $E>V$ stated withouth proof,
+\begin{align*}
+T &= \frac{4 k_1 k_2 }{(k_1 + k_2)^2}\\
+R &= \frac{(k_1 - k_2)^2}{(k_1+k_2)^2},
+\end{align*}
+with,
+\begin{align*}
+k_1 &= \sqrt{2E}\\
+k_2 &= \sqrt{2(E-V)},
+\end{align*}
+in our dimensionless units $\hbar=c=1$ and $m=1$ for incoming plane waves with definite momentum. I chose fixed energy $E=1.25\cdotV$ and observed that increasing the width of the wavepacket forced the coeffiecients to their plane wave values of,
+\begin{align*}
+T&=0.854\\
+R&=0.146.
+\end{align*}
+Varying the size of the step potential did not appear to have any effect.
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/RT_V1500_sigma0p05.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/RT_V3000_sigma0p05.eps}}
+  \caption{\label{EoverV} Reflection (black) and transmission (red) as a function of incoming energy for two different sizes of step potential. The rise in potential did not appear to have a significant effect on the transmission and reflection curves.}
+\end{figure}
+\begin{figure}[h]
+  \centering
+  \captionsetup[subfigure]{labelformat=empty}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/RT_V1500_E=1p25V_sigma.eps}}
+  \subfloat[][]{\includegraphics[width=0.5\textwidth]{figures/RT_V3000_E=1p25V_sigma.eps}}
+  \caption{\label{sigmas} Reflection and transmission coefficient as a function of initial $t=0$ width of the gaussian packet. Increasing he initial width expands the gaussian packet more closely mirroring an incoming plane wave.}
+\end{figure}
 \end{document}

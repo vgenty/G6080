@@ -2,11 +2,12 @@
 
 from ROOT import    * #import it all who gives a hoot
 import numpy as np
-#from looks import   *
-#from methods import *
+from looks import   *
+from methods import *
+import subprocess32 as sp
 #from root_numpy import root2array, root2rec, tree2rec
 
-#looks_minos()
+looks_minos()
 
 tfile = TFile("outfile.root","READ")
 ttree = tfile.Get("data")
