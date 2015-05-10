@@ -1,5 +1,7 @@
 #include "includes.h"
 
+//Prototypes and type definitions:
+
 typedef SparseMatrix<std::complex<double> > SMCD;
 
 std::complex<double> ii(0,1);
@@ -8,6 +10,12 @@ double V(const double,const double);
 std::complex<double> wave_packet(const double&, const double,
 				 const double,  const double,
 				 const double);
+
+double wave_pocket(const double, const double);
+
+double V_pocket(const double, const double,
+		const double, const double,
+		const double);
 double pi();
 
 std::tuple<SMCD,
@@ -17,6 +25,8 @@ VectorXcd solve_LU(SMCD&,
 		   SMCD&,
 		   VectorXcd&);
 
+
+//Begin main program
   
 int main(int argc, char** argv) {
 
@@ -34,7 +44,7 @@ int main(int argc, char** argv) {
   std::vector<double> xx(N+1,0.0);
 
   //Possibly user defined parameters
-  double V0    = 3000;
+  double V0    = 1000;
   double E0    = V0*atof(argv[1]); //Incoming packet energy
   //  double sigma = 0.05;
   double sigma = atof(argv[3]);
@@ -49,6 +59,14 @@ int main(int argc, char** argv) {
   
   //Just let mass of particle be m=1 why not
   
+  //Decaying state
+  auto h = 150.0; //potential height
+  auto w = 0.20;  //inner width
+  auto b = 10.0;  //bottom height
+  auto s = 0.01;  //side width
+  //E0 = pow(pi(),2.0)/(2*pow(w,2.0));
+  
+  
   //ROOT stuff
   TFile *tf = new TFile(argv[2],"RECREATE");
   TTree *tt = new TTree("data","data");
@@ -57,11 +75,13 @@ int main(int argc, char** argv) {
     = new std::vector<double>(N+1,0.0);
   double psi2;
   double ref = 0.0;
+  double psi2inside;
   
   tt->Branch("y",&y); //address of pointer
   tt->Branch("x",&xx); 
   tt->Branch("psi2",&psi2,"psi2/D");
   tt->Branch("ref" ,&ref ,"ref/D");
+  tt->Branch("psi2inside" ,&psi2inside ,"psi2inside/D");
   
   std::cout << "\n\t=== 1d Schrodinger on chain ===\n";
   std::cout << "\n";
@@ -83,13 +103,16 @@ int main(int argc, char** argv) {
   //Index to lattice space conversion
   for(unsigned int i = 0; i < xx.size(); ++i) {
     xx[i] = -1 + a*i;
-    psi[0](i) = wave_packet(xx[i],E0,sigma,-1.0,k);
+    //psi[0](i) = wave_packet(xx[i],E0,sigma,-1.0,k);
+    psi[0](i) = wave_pocket(xx[i],w);
   }
 
   
   //Initialize W;
   for(int i = 1; i < N; ++i) {
-    W.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/dt - 2.0*pow(dx,2)*V(xx[i],V0));
+    //W.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/dt - 2.0*pow(dx,2)*V(xx[i],V0));
+    W.insert(i,i)   = (-2.0 + 4.0*ii*pow(dx,2)/dt - 2.0*pow(dx,2)*V_pocket(s,b,w,h,xx[i]));
+    
     if(i>1) W.insert(i-1,i) = 1.0;
     if(i<N-1) W.insert(i+1,i) = 1.0;
     
@@ -128,11 +151,13 @@ int main(int argc, char** argv) {
   double rref;
   std::for_each(psi.begin(),psi.end(),[&](VectorXcd p){
       rref = 0.0;
-
+      psi2inside = 0.0;
       for(int o = 0 ; o < N+1; ++o) {
 	y->at(o) = std::norm(p(o));
 	if(xx[o] < 0.0)
 	  rref += std::norm(p(o))*dx;
+	if(fabs(xx[o]) < w/2.0)
+	  psi2inside += std::norm(p(o))*dx;
       }
       
       psi2 = (p.dot(p)).real()*dx;
@@ -169,6 +194,27 @@ double V(const double x,const double V0) {
     return V0;
   else
     return 0.0;
+}
+double wave_pocket(const double x, const double w) {
+
+  if(fabs(x) < w/2.0)
+    return sqrt(2/w)*cos(pi()*x/w);
+  else
+    return 0.0;
+}
+
+double V_pocket(const double s, const double b,
+		const double w, const double h,
+		const double x) {
+  
+  if(fabs(x) < w/2.0)
+    return b;
+  else if((x <= -1.0*w/2.0 && x >=(-1.0*w/2.0) - s) || 
+	  (x >= w/2.0 && x <= w/2.0 + s))
+    return h;
+  else
+    return 0.0;
+
 }
 
 std::tuple<SMCD,SMCD> get_LU(SMCD& A) {
@@ -223,7 +269,6 @@ VectorXcd solve_LU(SMCD& L, SMCD& U, VectorXcd& b) {
     else
       x(i) = 0.0;
   
-
   return x;
 
 }
