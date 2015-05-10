@@ -1,4 +1,4 @@
-*.o 
+*.o
 *.so
 1a
 1c
@@ -12,3 +12,6 @@ executable
 *.log
 *.root
 *.dat
+ev
+\#*\#
+aye

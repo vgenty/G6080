@@ -7,6 +7,7 @@ typedef SparseMatrix<std::complex<double> > SMCD;
 std::complex<double> ii(0,1);
 
 double V(const double,const double);
+
 std::complex<double> wave_packet(const double&, const double,
 				 const double,  const double,
 				 const double);
@@ -60,9 +61,9 @@ int main(int argc, char** argv) {
   //Just let mass of particle be m=1 why not
   
   //Decaying state
-  auto h = 150.0; //potential height
-  auto w = 0.20;  //inner width
-  auto b = 10.0;  //bottom height
+  auto h = 3000.0; //potential height
+  auto w = 0.1;  //inner width
+  auto b = 5.0;  //bottom height
   auto s = 0.01;  //side width
   //E0 = pow(pi(),2.0)/(2*pow(w,2.0));
   
@@ -76,12 +77,14 @@ int main(int argc, char** argv) {
   double psi2;
   double ref = 0.0;
   double psi2inside;
+  double psi2res;
   
   tt->Branch("y",&y); //address of pointer
   tt->Branch("x",&xx); 
   tt->Branch("psi2",&psi2,"psi2/D");
   tt->Branch("ref" ,&ref ,"ref/D");
   tt->Branch("psi2inside" ,&psi2inside ,"psi2inside/D");
+  tt->Branch("psi2res" ,&psi2res ,"psi2res/D");
   
   std::cout << "\n\t=== 1d Schrodinger on chain ===\n";
   std::cout << "\n";
@@ -103,7 +106,7 @@ int main(int argc, char** argv) {
   //Index to lattice space conversion
   for(unsigned int i = 0; i < xx.size(); ++i) {
     xx[i] = -1 + a*i;
-    //psi[0](i) = wave_packet(xx[i],E0,sigma,-1.0,k);
+    //psi[0](i) = wave_packet(xx[i],E0,sigma,-0.5,k);
     psi[0](i) = wave_pocket(xx[i],w);
   }
 
@@ -152,12 +155,16 @@ int main(int argc, char** argv) {
   std::for_each(psi.begin(),psi.end(),[&](VectorXcd p){
       rref = 0.0;
       psi2inside = 0.0;
+      psi2res = 0.0;
+
       for(int o = 0 ; o < N+1; ++o) {
 	y->at(o) = std::norm(p(o));
 	if(xx[o] < 0.0)
 	  rref += std::norm(p(o))*dx;
 	if(fabs(xx[o]) < w/2.0)
 	  psi2inside += std::norm(p(o))*dx;
+	if(xx[o] > (w/2.0 + s))
+	  psi2res += std::norm(p(o))*dx;
       }
       
       psi2 = (p.dot(p)).real()*dx;

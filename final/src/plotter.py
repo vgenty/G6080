@@ -5,11 +5,12 @@ import numpy as np
 from looks import   *
 from methods import *
 import subprocess32 as sp
+import sys
 #from root_numpy import root2array, root2rec, tree2rec
 
 looks_minos()
 
-tfile = TFile("outfile.root","READ")
+tfile = TFile(sys.argv[1],"READ")
 ttree = tfile.Get("data")
 
 #rec = tree2rec(ttree)

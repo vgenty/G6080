@@ -36,7 +36,7 @@ tit = TPaveText(0.2988506,0.934322,0.6997126,1,"nbNDC")
 tit.SetFillColor(0)
 tit.SetFillStyle(0)
 tit.SetLineColor(0)
-tit.AddText("f(t) = a + b exp(c t)")
+tit.AddText("f(t) = p0 + p1 exp(p2 t)")
 tit.Draw()
 
 tf = TF1("tf","[0] + [1]*exp([2]*x)",50,700)
