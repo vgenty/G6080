@@ -18,10 +18,12 @@ ttree = tfile.Get("data")
 c1 = TCanvas()
 c1.cd()
 
+
 tg = TGraph()
 tg.SetLineWidth(2)
 c = 0
 t = -1
+
 for e in ttree:
     t+=1
     for o in xrange(len(e.y)):

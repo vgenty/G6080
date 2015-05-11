@@ -61,9 +61,9 @@ int main(int argc, char** argv) {
   //Just let mass of particle be m=1 why not
   
   //Decaying state
-  auto h = 3000.0; //potential height
+  auto h = 3000.0;//potential height
   auto w = 0.1;  //inner width
-  auto b = 5.0;  //bottom height
+  auto b = 0.5;   //bottom height
   auto s = 0.01;  //side width
   //E0 = pow(pi(),2.0)/(2*pow(w,2.0));
   
@@ -106,8 +106,8 @@ int main(int argc, char** argv) {
   //Index to lattice space conversion
   for(unsigned int i = 0; i < xx.size(); ++i) {
     xx[i] = -1 + a*i;
-    //psi[0](i) = wave_packet(xx[i],E0,sigma,-0.5,k);
-    psi[0](i) = wave_pocket(xx[i],w);
+    psi[0](i) = wave_packet(xx[i],E0,sigma,-0.5,k);
+    //psi[0](i) = wave_pocket(xx[i],w);
   }
 
   
@@ -205,7 +205,7 @@ double V(const double x,const double V0) {
 double wave_pocket(const double x, const double w) {
 
   if(fabs(x) < w/2.0)
-    return sqrt(2/w)*cos(pi()*x/w);
+    return sqrt(2/w)*sin(2*pi()*x/w);
   else
     return 0.0;
 }

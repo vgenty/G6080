@@ -14,7 +14,7 @@ jobs = []
 def worker(l):
     sb.call(["./ev",str(l),"hey_%s.root" % l, "0.1"])
 
-spacing = np.linspace(2.5, 7.0, num=50)
+spacing = np.linspace(3.0, 5.0, num=50)
 for l in spacing:
     print "Calling E=%s*V0" %l
     #worker(l)
@@ -41,7 +41,7 @@ tgT.SetLineWidth(2)
 pp=0
 c = 0
 
-time = 150
+time = 180
 
 for tree in ttrees:
     c = 0
